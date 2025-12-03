@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplicació de monomis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .score {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .score span {
+            color: #667eea;
+        }
+        
+        .difficulty-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .difficulty-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .difficulty-btn:hover {
+            background: #e7f3ff;
+        }
+        
+        .difficulty-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .exercise-display {
+            background: #f8f9fa;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            font-family: 'Courier New', monospace;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .answer-section {
+            margin-bottom: 25px;
+        }
+        
+        .answer-label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .answer-input-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .equals {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        input[type="text"] {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 24px;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        input.correct {
+            border-color: #28a745;
+            background-color: #d4edda;
+        }
+        
+        input.incorrect {
+            border-color: #dc3545;
+            background-color: #f8d7da;
+        }
+        
+        .hint-section {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .hint-title {
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 8px;
+        }
+        
+        .hint-steps {
+            color: #856404;
+            line-height: 1.6;
+        }
+        
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-align: center;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+        
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+        
+        .feedback.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffc107;
+        }
+        
+        .step-by-step {
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: left;
+            background: rgba(255,255,255,0.5);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-check {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-check:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-hint {
+            background: #ffc107;
+            color: #333;
+            flex: 0.5;
+        }
+        
+        .btn-hint:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+        }
+        
+        .btn-new {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-new:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .help-text {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-top: 25px;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .help-text strong {
+            color: #667eea;
+        }
+        
+        .help-text ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .exercise-display {
+                font-size: 24px;
+                padding: 20px;
+            }
+            
+            input[type="text"] {
+                font-size: 20px;
+            }
+            
+            .difficulty-selector {
+                flex-direction: column;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✖️ Multiplicació de monomis</h1>
+        <p class="subtitle">Exercici interactiu de Matemàtiques - 2n ESO</p>
+        
+        <div class="score">
+            Encerts: <span id="score">0</span> | Errors: <span id="errors" style="color: #dc3545;">0</span>
+        </div>
+        
+        <div class="difficulty-selector">
+            <button class="difficulty-btn active" onclick="setDifficulty('easy')">Fàcil</button>
+            <button class="difficulty-btn" onclick="setDifficulty('medium')">Mitjà</button>
+            <button class="difficulty-btn" onclick="setDifficulty('hard')">Difícil</button>
+        </div>
+        
+        <div class="exercise-display" id="exerciseDisplay"></div>
+        
+        <div class="hint-section" id="hintSection" style="display: none;">
+            <div class="hint-title">💡 Ajuda pas a pas:</div>
+            <div class="hint-steps" id="hintSteps"></div>
+        </div>
+        
+        <div class="answer-section">
+            <label class="answer-label">La teva resposta:</label>
+            <div class="answer-input-container">
+                <span class="equals">=</span>
+                <input type="text" id="answerInput" placeholder="Ex: 12x³, -6a²b³...">
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <button class="btn-hint" onclick="showHint()">💡 Pista</button>
+            <button class="btn-check" id="checkBtn" onclick="checkAnswer()">✓ Comprovar</button>
+            <button class="btn-new" onclick="newExercise()">→ Nou exercici</button>
+        </div>
+        
+        <div class="feedback" id="feedback"></div>
+        
+        <div class="help-text">
+            <strong>Recordatori - Multiplicació de monomis:</strong>
+            <ul>
+                <li><strong>Coeficients:</strong> Es multipliquen entre ells</li>
+                <li><strong>Variables iguals:</strong> Es conserven i es sumen els seus exponents</li>
+                <li><strong>Variables diferents:</strong> Es posen totes juntes</li>
+                <li>Exemple: <code>(3x²) · (4x³) = 12x⁵</code> (coeficients: 3×4=12, exponents: 2+3=5)</li>
+                <li>Exemple: <code>(2x) · (5y) = 10xy</code></li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        let currentExercise = {};
+        let score = 0;
+        let errors = 0;
+        let difficulty = 'easy';
+        let hintShown = false;
+        
+        const variables = ['x', 'y', 'z', 'a', 'b'];
+        
+        function toSuperscript(num) {
+            const superscripts = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'];
+            return num.toString().split('').map(d => superscripts[parseInt(d)]).join('');
+        }
+        
+        function setDifficulty(level) {
+            difficulty = level;
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            newExercise();
+        }
+        
+        function generateMonomi() {
+            const coeficient = Math.floor(Math.random() * 9) + 1; // 1 a 9
+            const sign = Math.random() > 0.5 ? 1 : -1;
+            const finalCoef = coeficient * sign;
+            
+            const varsData = [];
+            let numVars = 1;
+            
+            if (difficulty === 'medium') {
+                numVars = Math.random() > 0.5 ? 1 : 2;
+            } else if (difficulty === 'hard') {
+                numVars = Math.floor(Math.random() * 2) + 1; // 1 o 2
+            }
+            
+            const availableVars = [...variables];
+            let literal = '';
+            
+            for (let i = 0; i < numVars; i++) {
+                const randomIndex = Math.floor(Math.random() * availableVars.length);
+                const variable = availableVars[randomIndex];
+                availableVars.splice(randomIndex, 1);
+                
+                let exponent = 1;
+                if (difficulty === 'easy') {
+                    exponent = Math.floor(Math.random() * 3) + 1; // 1 a 3
+                } else if (difficulty === 'medium') {
+                    exponent = Math.floor(Math.random() * 4) + 1; // 1 a 4
+                } else {
+                    exponent = Math.floor(Math.random() * 5) + 1; // 1 a 5
+                }
+                
+                varsData.push({ variable, exponent });
+                literal += variable + (exponent > 1 ? toSuperscript(exponent) : '');
+            }
+            
+            let display = '';
+            if (finalCoef === 1 && literal) {
+                display = literal;
+            } else if (finalCoef === -1 && literal) {
+                display = '-' + literal;
+            } else {
+                display = finalCoef + literal;
+            }
+            
+            return {
+                coeficient: finalCoef,
+                varsData: varsData,
+                literal: literal,
+                display: display
+            };
+        }
+        
+        function multiplyMonomis(m1, m2) {
+            // Multiplica coeficients
+            const resultCoef = m1.coeficient * m2.coeficient;
+            
+            // Combina variables
+            const varMap = {};
+            
+            m1.varsData.forEach(v => {
+                varMap[v.variable] = (varMap[v.variable] || 0) + v.exponent;
+            });
+            
+            m2.varsData.forEach(v => {
+                varMap[v.variable] = (varMap[v.variable] || 0) + v.exponent;
+            });
+            
+            // Construeix la part literal ordenada alfabèticament
+            const sortedVars = Object.keys(varMap).sort();
+            let literal = '';
+            const varsData = [];
+            
+            sortedVars.forEach(v => {
+                const exp = varMap[v];
+                varsData.push({ variable: v, exponent: exp });
+                literal += v + (exp > 1 ? toSuperscript(exp) : '');
+            });
+            
+            // Construeix el display
+            let display = '';
+            if (resultCoef === 1 && literal) {
+                display = literal;
+            } else if (resultCoef === -1 && literal) {
+                display = '-' + literal;
+            } else if (literal) {
+                display = resultCoef + literal;
+            } else {
+                display = resultCoef.toString();
+            }
+            
+            return {
+                coeficient: resultCoef,
+                varsData: varsData,
+                literal: literal,
+                display: display
+            };
+        }
+        
+        function generateExercise() {
+            const monomi1 = generateMonomi();
+            const monomi2 = generateMonomi();
+            const result = multiplyMonomis(monomi1, monomi2);
+            
+            const display = `(${monomi1.display}) · (${monomi2.display})`;
+            
+            return {
+                monomi1: monomi1,
+                monomi2: monomi2,
+                result: result,
+                display: display
+            };
+        }
+        
+        function showHint() {
+            hintShown = true;
+            const hintSection = document.getElementById('hintSection');
+            const hintSteps = document.getElementById('hintSteps');
+            
+            const m1 = currentExercise.monomi1;
+            const m2 = currentExercise.monomi2;
+            const result = currentExercise.result;
+            
+            let steps = `<strong>Pas 1:</strong> Multiplica els coeficients: ${m1.coeficient} × ${m2.coeficient} = ${result.coeficient}<br>`;
+            
+            steps += `<strong>Pas 2:</strong> Per cada variable, suma els exponents:<br>`;
+            
+            result.varsData.forEach(v => {
+                const exp1 = m1.varsData.find(vd => vd.variable === v.variable)?.exponent || 0;
+                const exp2 = m2.varsData.find(vd => vd.variable === v.variable)?.exponent || 0;
+                
+                if (exp1 > 0 && exp2 > 0) {
+                    steps += `&nbsp;&nbsp;• ${v.variable}: ${exp1} + ${exp2} = ${v.exponent}<br>`;
+                } else if (exp1 > 0) {
+                    steps += `&nbsp;&nbsp;• ${v.variable}: només apareix al primer monomi (exponent ${exp1})<br>`;
+                } else {
+                    steps += `&nbsp;&nbsp;• ${v.variable}: només apareix al segon monomi (exponent ${exp2})<br>`;
+                }
+            });
+            
+            steps += `<strong>Resultat:</strong> ${result.display}`;
+            
+            hintSteps.innerHTML = steps;
+            hintSection.style.display = 'block';
+        }
+        
+        function normalizeAnswer(str) {
+            str = str.toLowerCase().trim().replace(/\s/g, '');
+            
+            // Converteix superscripts a format normal per comparar
+            const superToNormal = {
+                '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4',
+                '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9'
+            };
+            Object.keys(superToNormal).forEach(sup => {
+                str = str.split(sup).join(superToNormal[sup]);
+            });
+            
+            return str;
+        }
+        
+        function checkAnswer() {
+            const userAnswer = normalizeAnswer(document.getElementById('answerInput').value);
+            const feedback = document.getElementById('feedback');
+            const input = document.getElementById('answerInput');
+            
+            if (!userAnswer) {
+                feedback.className = 'feedback warning';
+                feedback.textContent = '⚠️ Escriu una resposta!';
+                return;
+            }
+            
+            const correctAnswer = normalizeAnswer(currentExercise.result.display);
+            
+            if (userAnswer === correctAnswer) {
+                input.className = 'correct';
+                feedback.className = 'feedback correct';
+                
+                let message = '🎉 Excel·lent! La resposta és correcta!';
+                if (hintShown) {
+                    message += ' (Has utilitzat una pista)';
+                }
+                feedback.textContent = message;
+                
+                score++;
+                document.getElementById('score').textContent = score;
+            } else {
+                input.className = 'incorrect';
+                feedback.className = 'feedback incorrect';
+                
+                const stepByStep = document.createElement('div');
+                stepByStep.className = 'step-by-step';
+                stepByStep.innerHTML = `
+                    <strong>Procés correcte:</strong><br>
+                    1. Coeficients: ${currentExercise.monomi1.coeficient} × ${currentExercise.monomi2.coeficient} = ${currentExercise.result.coeficient}<br>
+                    2. Variables: suma els exponents de les mateixes lletres<br>
+                    <strong>Resposta correcta: ${currentExercise.result.display}</strong>
+                `;
+                
+                feedback.innerHTML = '✗ Incorrecte.';
+                feedback.appendChild(stepByStep);
+                
+                errors++;
+                document.getElementById('errors').textContent = errors;
+            }
+            
+            document.getElementById('checkBtn').disabled = true;
+        }
+        
+        function newExercise() {
+            currentExercise = generateExercise();
+            document.getElementById('exerciseDisplay').textContent = currentExercise.display;
+            document.getElementById('answerInput').value = '';
+            
+            const input = document.getElementById('answerInput');
+            const feedback = document.getElementById('feedback');
+            const hintSection = document.getElementById('hintSection');
+            
+            input.className = '';
+            feedback.className = 'feedback';
+            feedback.textContent = '';
+            hintSection.style.display = 'none';
+            hintShown = false;
+            
+            document.getElementById('checkBtn').disabled = false;
+            document.getElementById('answerInput').focus();
+        }
+        
+        // Permet comprovar amb Enter
+        document.getElementById('answerInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !document.getElementById('checkBtn').disabled) {
+                checkAnswer();
+            }
+        });
+        
+        // Inicia el primer exercici
+        newExercise();
+    </script>
+</body>
+</html>
