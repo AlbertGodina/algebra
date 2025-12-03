@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identificar parts del monomi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .score {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .score span {
+            color: #667eea;
+        }
+        
+        .monomi-display {
+            background: #f8f9fa;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 48px;
+            font-weight: bold;
+            color: #333;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .question-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        input.correct {
+            border-color: #28a745;
+            background-color: #d4edda;
+        }
+        
+        input.incorrect {
+            border-color: #dc3545;
+            background-color: #f8d7da;
+        }
+        
+        .feedback {
+            margin-top: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            min-height: 20px;
+        }
+        
+        .feedback.correct {
+            color: #28a745;
+        }
+        
+        .feedback.incorrect {
+            color: #dc3545;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-check {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-check:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-new {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-new:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+        
+        .btn-check:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .help-text {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .help-text strong {
+            color: #667eea;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .monomi-display {
+                font-size: 36px;
+                padding: 20px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔢 Identifica les parts del monomi</h1>
+        <p class="subtitle">Exercici interactiu de Matemàtiques - 2n ESO</p>
+        
+        <div class="score">
+            Encerts: <span id="score">0</span> | Errors: <span id="errors" style="color: #dc3545;">0</span>
+        </div>
+        
+        <div class="monomi-display" id="monomiDisplay"></div>
+        
+        <div class="question-group">
+            <label for="coeficient">Coeficient:</label>
+            <input type="text" id="coeficient" placeholder="Ex: -5, 3, 1...">
+            <div class="feedback" id="coeficientFeedback"></div>
+        </div>
+        
+        <div class="question-group">
+            <label for="partLiteral">Part literal:</label>
+            <input type="text" id="partLiteral" placeholder="Ex: x³y², a²b, xyz...">
+            <div class="feedback" id="partLiteralFeedback"></div>
+        </div>
+        
+        <div class="question-group">
+            <label for="grau">Grau:</label>
+            <input type="text" id="grau" placeholder="Ex: 5, 3, 1...">
+            <div class="feedback" id="grauFeedback"></div>
+        </div>
+        
+        <div class="buttons">
+            <button class="btn-check" id="checkBtn" onclick="checkAnswers()">✓ Comprovar respostes</button>
+            <button class="btn-new" onclick="newExercise()">→ Nou exercici</button>
+        </div>
+        
+        <div class="help-text">
+            <strong>Recordatori:</strong> En un monomi com <code>-5x³y²</code>, el <strong>coeficient</strong> és el número (-5), 
+            la <strong>part literal</strong> són les lletres amb els seus exponents (x³y²), 
+            i el <strong>grau</strong> és la suma dels exponents (3+2=5).
+        </div>
+    </div>
+    
+    <script>
+        let currentMonomi = {};
+        let score = 0;
+        let errors = 0;
+        
+        const variables = ['x', 'y', 'z', 'a', 'b'];
+        
+        function generateMonomi() {
+            // Genera un coeficient aleatori (pot ser negatiu)
+            const coeficient = Math.floor(Math.random() * 19) - 9; // de -9 a 9
+            if (coeficient === 0 || coeficient === 1) {
+                return generateMonomi(); // Regenera si és 0 o 1 per fer-ho més interessant
+            }
+            
+            // Genera 1-3 variables diferents
+            const numVars = Math.floor(Math.random() * 3) + 1;
+            const selectedVars = [];
+            const availableVars = [...variables];
+            
+            for (let i = 0; i < numVars; i++) {
+                const randomIndex = Math.floor(Math.random() * availableVars.length);
+                selectedVars.push(availableVars[randomIndex]);
+                availableVars.splice(randomIndex, 1);
+            }
+            
+            // Genera exponents per cada variable
+            let partLiteral = '';
+            let grau = 0;
+            
+            selectedVars.forEach(v => {
+                const exponent = Math.floor(Math.random() * 5) + 1; // de 1 a 5
+                grau += exponent;
+                partLiteral += v;
+                if (exponent > 1) {
+                    partLiteral += toSuperscript(exponent);
+                }
+            });
+            
+            // Genera la representació visual
+            let display = '';
+            if (coeficient === -1) {
+                display = '-' + partLiteral;
+            } else {
+                display = coeficient + partLiteral;
+            }
+            
+            return {
+                coeficient: coeficient,
+                partLiteral: partLiteral,
+                grau: grau,
+                display: display
+            };
+        }
+        
+        function toSuperscript(num) {
+            const superscripts = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'];
+            return num.toString().split('').map(d => superscripts[parseInt(d)]).join('');
+        }
+        
+        function newExercise() {
+            currentMonomi = generateMonomi();
+            document.getElementById('monomiDisplay').textContent = currentMonomi.display;
+            
+            // Neteja els camps
+            document.getElementById('coeficient').value = '';
+            document.getElementById('partLiteral').value = '';
+            document.getElementById('grau').value = '';
+            
+            // Neteja els feedbacks
+            ['coeficient', 'partLiteral', 'grau'].forEach(id => {
+                const input = document.getElementById(id);
+                const feedback = document.getElementById(id + 'Feedback');
+                input.className = '';
+                feedback.className = 'feedback';
+                feedback.textContent = '';
+            });
+            
+            // Habilita el botó de comprovar
+            document.getElementById('checkBtn').disabled = false;
+            
+            // Focus al primer camp
+            document.getElementById('coeficient').focus();
+        }
+        
+        function normalizePartLiteral(str) {
+            // Elimina espais i converteix superscripts a números normals
+            str = str.replace(/\s/g, '');
+            
+            // Converteix superscripts a format normal
+            const superToNormal = {
+                '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4',
+                '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9'
+            };
+            
+            Object.keys(superToNormal).forEach(sup => {
+                str = str.split(sup).join(superToNormal[sup]);
+            });
+            
+            return str;
+        }
+        
+        function checkAnswers() {
+            let allCorrect = true;
+            
+            // Comprova coeficient
+            const coeficientInput = document.getElementById('coeficient');
+            const coeficientValue = parseInt(coeficientInput.value);
+            const coeficientFeedback = document.getElementById('coeficientFeedback');
+            
+            if (coeficientValue === currentMonomi.coeficient) {
+                coeficientInput.className = 'correct';
+                coeficientFeedback.className = 'feedback correct';
+                coeficientFeedback.textContent = '✓ Correcte!';
+            } else {
+                coeficientInput.className = 'incorrect';
+                coeficientFeedback.className = 'feedback incorrect';
+                coeficientFeedback.textContent = `✗ Incorrecte. El coeficient és ${currentMonomi.coeficient}`;
+                allCorrect = false;
+            }
+            
+            // Comprova part literal
+            const partLiteralInput = document.getElementById('partLiteral');
+            const partLiteralValue = normalizePartLiteral(partLiteralInput.value);
+            const partLiteralCorrect = normalizePartLiteral(currentMonomi.partLiteral);
+            const partLiteralFeedback = document.getElementById('partLiteralFeedback');
+            
+            if (partLiteralValue === partLiteralCorrect) {
+                partLiteralInput.className = 'correct';
+                partLiteralFeedback.className = 'feedback correct';
+                partLiteralFeedback.textContent = '✓ Correcte!';
+            } else {
+                partLiteralInput.className = 'incorrect';
+                partLiteralFeedback.className = 'feedback incorrect';
+                partLiteralFeedback.textContent = `✗ Incorrecte. La part literal és ${currentMonomi.partLiteral}`;
+                allCorrect = false;
+            }
+            
+            // Comprova grau
+            const grauInput = document.getElementById('grau');
+            const grauValue = parseInt(grauInput.value);
+            const grauFeedback = document.getElementById('grauFeedback');
+            
+            if (grauValue === currentMonomi.grau) {
+                grauInput.className = 'correct';
+                grauFeedback.className = 'feedback correct';
+                grauFeedback.textContent = '✓ Correcte!';
+            } else {
+                grauInput.className = 'incorrect';
+                grauFeedback.className = 'feedback incorrect';
+                grauFeedback.textContent = `✗ Incorrecte. El grau és ${currentMonomi.grau}`;
+                allCorrect = false;
+            }
+            
+            // Actualitza puntuació
+            if (allCorrect) {
+                score++;
+                document.getElementById('score').textContent = score;
+            } else {
+                errors++;
+                document.getElementById('errors').textContent = errors;
+            }
+            
+            // Desactiva el botó de comprovar
+            document.getElementById('checkBtn').disabled = true;
+        }
+        
+        // Permet comprovar amb Enter
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !document.getElementById('checkBtn').disabled) {
+                    checkAnswers();
+                }
+            });
+        });
+        
+        // Inicia el primer exercici
+        newExercise();
+    </script>
+</body>
+</html>
