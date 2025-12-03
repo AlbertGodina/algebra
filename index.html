@@ -1,1 +1,365 @@
-
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Àlgebra - Recursos 2n ESO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            color: white;
+            padding: 40px 20px;
+            margin-bottom: 40px;
+        }
+        
+        header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        header p {
+            font-size: 20px;
+            opacity: 0.9;
+        }
+        
+        .intro {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .intro h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .intro p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            color: white;
+            font-size: 32px;
+            margin-bottom: 20px;
+            padding-left: 10px;
+            border-left: 5px solid white;
+        }
+        
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        
+        .card-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .card-title {
+            color: #667eea;
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .card-description {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .card-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        .coming-soon {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .coming-soon:hover {
+            transform: none;
+        }
+        
+        .coming-soon .card-badge {
+            background: #999;
+        }
+        
+        footer {
+            text-align: center;
+            color: white;
+            padding: 30px;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+        
+        footer a {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        .github-link {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            color: #333;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        
+        .github-link:hover {
+            transform: scale(1.05);
+            box-shadow: 0 7px 20px rgba(0,0,0,0.3);
+        }
+        
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 36px;
+            }
+            
+            .section-title {
+                font-size: 24px;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .github-link {
+                position: static;
+                display: block;
+                width: fit-content;
+                margin: 0 auto 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="https://github.com/AlbertGodina/algebra" class="github-link" target="_blank">
+        📚 Veure a GitHub
+    </a>
+    
+    <div class="container">
+        <header>
+            <h1>🔢 Expressions Algebraiques</h1>
+            <p>Recursos interactius de Matemàtiques per a 2n d'ESO</p>
+        </header>
+        
+        <div class="intro">
+            <h2>👋 Benvingut/da!</h2>
+            <p>Aquest és un repositori d'exercicis interactius per practicar expressions algebraiques. Cada exercici és autocorrectiu i et dona feedback immediat.</p>
+            <p><strong>Com funciona?</strong> Fes clic a qualsevol exercici per començar a practicar. Pots fer-los tantes vegades com vulguis!</p>
+        </div>
+        
+        <!-- Tema 1: Monomis -->
+        <div class="section">
+            <h2 class="section-title">📐 Tema 1: Monomis</h2>
+            <div class="cards-grid">
+                <a href="exercicis/monomis/identificar_parts.html" class="card">
+                    <div class="card-icon">🎯</div>
+                    <h3 class="card-title">Identificar parts del monomi</h3>
+                    <p class="card-description">
+                        Practica identificant el coeficient, la part literal i el grau de diferents monomis.
+                    </p>
+                    <span class="card-badge">Disponible</span>
+                </a>
+                
+                <div class="card coming-soon">
+                    <div class="card-icon">🧩</div>
+                    <h3 class="card-title">Monomis semblants</h3>
+                    <p class="card-description">
+                        Aprèn a identificar i agrupar monomis semblants segons la seva part literal.
+                    </p>
+                    <span class="card-badge">Pròximament</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tema 2: Operacions amb Monomis -->
+        <div class="section">
+            <h2 class="section-title">➕ Tema 2: Operacions amb Monomis</h2>
+            <div class="cards-grid">
+                <div class="card coming-soon">
+                    <div class="card-icon">➕</div>
+                    <h3 class="card-title">Suma i resta de monomis</h3>
+                    <p class="card-description">
+                        Practica sumar i restar monomis semblants i reconèixer quan no es poden operar.
+                    </p>
+                    <span class="card-badge">Pròximament</span>
+                </div>
+                
+                <div class="card coming-soon">
+                    <div class="card-icon">✖️</div>
+                    <h3 class="card-title">Multiplicació de monomis</h3>
+                    <p class="card-description">
+                        Aprèn a multiplicar monomis: coeficients i exponents.
+                    </p>
+                    <span class="card-badge">Pròximament</span>
+                </div>
+                
+                <div class="card coming-soon">
+                    <div class="card-icon">➗</div>
+                    <h3 class="card-title">Divisió de monomis</h3>
+                    <p class="card-description">
+                        Practica la divisió de monomis i identifica quan és possible dividir.
+                    </p>
+                    <span class="card-badge">Pròximament</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tema 3: Polinomis -->
+        <div class="section">
+            <h2 class="section-title">📊 Tema 3: Polinomis</h2>
+            <div class="cards-grid">
+                <div class="card coming-soon">
+                    <div class="card-icon">📝</div>
+                    <h3 class="card-title">Identificar i ordenar polinomis</h3>
+                    <p class="card-description">
+                        Aprèn a identificar el grau d'un polinomi i a ordenar-lo correctament.
+                    </p>
+                    <span class="card-badge">Pròximament</span>
+                </div>
+                
+                <div class="card coming-soon">
+                    <div class="card-icon">🔢</div>
+                    <h3 class="card-title">Valor numèric de polinomis</h3>
+                    <p class="card-description">
+                        Practica calculant el valor numèric d'un polinomi per diferents valors.
+                    </p>
+                    <span class="card-badge">Pròximament</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tema 4: Operacions amb Polinomis -->
+        <div class="section">
+            <h2 class="section-title">🔄 Tema 4: Operacions amb Polinomis</h2>
+            <div class="cards-grid">
+                <div class="card coming-soon">
+                    <div class="card-icon">➕</div>
+                    <h3 class="card-title">Suma i resta de polinomis</h3>
+                    <p class="card-description">
+                        Practica operant amb polinomis: suma i resta terme a terme.
+                    </p>
+                    <span class="card-badge">Pròximament</span>
+                </div>
+                
+                <div class="card coming-soon">
+                    <div class="card-icon">✖️</div>
+                    <h3 class="card-title">Multiplicació de polinomis</h3>
+                    <p class="card-description">
+                        Aprèn a multiplicar polinomis utilitzant la propietat distributiva.
+                    </p>
+                    <span class="card-badge">Pròximament</span>
+                </div>
+                
+                <div class="card coming-soon">
+                    <div class="card-icon">🔍</div>
+                    <h3 class="card-title">Factor comú</h3>
+                    <p class="card-description">
+                        Practica l'extracció del factor comú en expressions algebraiques.
+                    </p>
+                    <span class="card-badge">Pròximament</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tema 5: Identitats Notables -->
+        <div class="section">
+            <h2 class="section-title">⭐ Tema 5: Identitats Notables</h2>
+            <div class="cards-grid">
+                <div class="card coming-soon">
+                    <div class="card-icon">🎓</div>
+                    <h3 class="card-title">Reconèixer identitats notables</h3>
+                    <p class="card-description">
+                        Identifica quin tipus d'identitat notable s'està utilitzant.
+                    </p>
+                    <span class="card-badge">Pròximament</span>
+                </div>
+                
+                <div class="card coming-soon">
+                    <div class="card-icon">📖</div>
+                    <h3 class="card-title">Desenvolupar identitats</h3>
+                    <p class="card-description">
+                        Practica desenvolupant les identitats notables més comunes.
+                    </p>
+                    <span class="card-badge">Pròximament</span>
+                </div>
+                
+                <div class="card coming-soon">
+                    <div class="card-icon">🔧</div>
+                    <h3 class="card-title">Factoritzar amb identitats</h3>
+                    <p class="card-description">
+                        Aprèn a factoritzar expressions utilitzant identitats notables.
+                    </p>
+                    <span class="card-badge">Pròximament</span>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>💡 <strong>Consell:</strong> Practica regularment per millorar les teves habilitats!</p>
+            <p>Creat amb ❤️ per a l'alumnat de 2n d'ESO</p>
+            <p><a href="https://github.com/AlbertGodina/algebra" target="_blank">Repositori GitHub</a></p>
+        </footer>
+    </div>
+</body>
+</html>
