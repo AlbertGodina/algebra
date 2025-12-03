@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identificar i ordenar polinomis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .score {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .score span {
+            color: #667eea;
+        }
+        
+        .polinomi-display {
+            background: #f8f9fa;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            font-family: 'Courier New', monospace;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .questions-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .question-group {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .question-label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+        }
+        
+        input[type="text"] {
+            font-size: 20px;
+            text-align: center;
+        }
+        
+        input[type="number"] {
+            text-align: center;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        input.correct {
+            border-color: #28a745;
+            background-color: #d4edda;
+        }
+        
+        input.incorrect {
+            border-color: #dc3545;
+            background-color: #f8d7da;
+        }
+        
+        .feedback {
+            margin-top: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            min-height: 20px;
+        }
+        
+        .feedback.correct {
+            color: #28a745;
+        }
+        
+        .feedback.incorrect {
+            color: #dc3545;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-check {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-check:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-new {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-new:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .help-text {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-top: 25px;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .help-text strong {
+            color: #667eea;
+        }
+        
+        .help-text ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        
+        .classification-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .class-option {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+            font-weight: 600;
+        }
+        
+        .class-option:hover {
+            background: #e7f3ff;
+            border-color: #667eea;
+        }
+        
+        .class-option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .class-option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        
+        .class-option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .polinomi-display {
+                font-size: 20px;
+                padding: 20px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Identificar i ordenar polinomis</h1>
+        <p class="subtitle">Exercici interactiu de Matemàtiques - 2n ESO</p>
+        
+        <div class="score">
+            Encerts: <span id="score">0</span> | Errors: <span id="errors" style="color: #dc3545;">0</span>
+        </div>
+        
+        <div class="polinomi-display" id="polinomiDisplay"></div>
+        
+        <div class="questions-container">
+            <div class="question-group">
+                <label class="question-label">1. Ordena el polinomi de major a menor grau:</label>
+                <input type="text" id="ordenatInput" placeholder="Ex: 3x² - 2x + 5">
+                <div class="feedback" id="ordenatFeedback"></div>
+            </div>
+            
+            <div class="question-group">
+                <label class="question-label">2. Quin és el grau del polinomi?</label>
+                <input type="number" id="grauInput" placeholder="Escriu un número">
+                <div class="feedback" id="grauFeedback"></div>
+            </div>
+            
+            <div class="question-group">
+                <label class="question-label">3. Com es classifica segons el nombre de termes?</label>
+                <div class="classification-options">
+                    <div class="class-option" onclick="selectClassification('monomi')">Monomi</div>
+                    <div class="class-option" onclick="selectClassification('binomi')">Binomi</div>
+                    <div class="class-option" onclick="selectClassification('trinomi')">Trinomi</div>
+                    <div class="class-option" onclick="selectClassification('polinomi')">Polinomi</div>
+                </div>
+                <div class="feedback" id="classFeedback"></div>
+            </div>
+            
+            <div class="question-group">
+                <label class="question-label">4. Quin és el terme independent?</label>
+                <input type="text" id="independentInput" placeholder="Ex: 5, -3, 0...">
+                <div class="feedback" id="independentFeedback"></div>
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <button class="btn-check" id="checkBtn" onclick="checkAnswers()">✓ Comprovar respostes</button>
+            <button class="btn-new" onclick="newExercise()">→ Nou exercici</button>
+        </div>
+        
+        <div class="help-text">
+            <strong>Recordatori:</strong>
+            <ul>
+                <li><strong>Ordenar:</strong> Col·loca els termes de major a menor exponent</li>
+                <li><strong>Grau:</strong> És l'exponent més gran que apareix al polinomi</li>
+                <li><strong>Classificació:</strong>
+                    <ul style="margin-top: 5px;">
+                        <li>Monomi: 1 terme (ex: 5x²)</li>
+                        <li>Binomi: 2 termes (ex: 3x + 2)</li>
+                        <li>Trinomi: 3 termes (ex: x² - x + 1)</li>
+                        <li>Polinomi: més de 3 termes</li>
+                    </ul>
+                </li>
+                <li><strong>Terme independent:</strong> El terme sense variable (el número sol)</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        let currentPolinomi = {};
+        let score = 0;
+        let errors = 0;
+        let selectedClass = null;
+        
+        function toSuperscript(num) {
+            const superscripts = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷'];
+            return superscripts[num] || num.toString();
+        }
+        
+        function generatePolinomi() {
+            const numTermes = Math.floor(Math.random() * 4) + 2; // 2 a 5 termes
+            const grauMax = Math.floor(Math.random() * 4) + 2; // grau 2 a 5
+            
+            const termes = [];
+            const exponents = [];
+            
+            // Genera exponents únics
+            for (let i = 0; i <= grauMax; i++) {
+                exponents.push(i);
+            }
+            
+            // Barreja i selecciona
+            exponents.sort(() => Math.random() - 0.5);
+            const selectedExponents = exponents.slice(0, numTermes);
+            
+            // Crea termes
+            selectedExponents.forEach(exp => {
+                let coef = Math.floor(Math.random() * 9) + 1; // 1 a 9
+                const sign = Math.random() > 0.5 ? 1 : -1;
+                coef *= sign;
+                
+                termes.push({
+                    coeficient: coef,
+                    exponent: exp
+                });
+            });
+            
+            // Barreja els termes per mostrar desordenats
+            const termesDesordenats = [...termes];
+            termesDesordenats.sort(() => Math.random() - 0.5);
+            
+            // Ordena correctament (de major a menor exponent)
+            const termesOrdenats = [...termes].sort((a, b) => b.exponent - a.exponent);
+            
+            // Calcula grau i classificació
+            const grau = Math.max(...termes.map(t => t.exponent));
+            
+            let classificacio;
+            if (numTermes === 1) classificacio = 'monomi';
+            else if (numTermes === 2) classificacio = 'binomi';
+            else if (numTermes === 3) classificacio = 'trinomi';
+            else classificacio = 'polinomi';
+            
+            // Troba terme independent
+            const termeIndependent = termes.find(t => t.exponent === 0);
+            const independent = termeIndependent ? termeIndependent.coeficient : 0;
+            
+            // Genera displays
+            const displayDesordenat = generateDisplay(termesDesordenats);
+            const displayOrdenat = generateDisplay(termesOrdenats);
+            
+            return {
+                termes: termes,
+                termesOrdenats: termesOrdenats,
+                grau: grau,
+                classificacio: classificacio,
+                independent: independent,
+                displayDesordenat: displayDesordenat,
+                displayOrdenat: displayOrdenat
+            };
+        }
+        
+        function generateDisplay(termes) {
+            let display = '';
+            
+            termes.forEach((terme, index) => {
+                const coef = terme.coeficient;
+                const exp = terme.exponent;
+                
+                // Afegeix signe
+                if (index === 0) {
+                    if (coef < 0) display += '-';
+                } else {
+                    display += coef >= 0 ? ' + ' : ' - ';
+                }
+                
+                const absCoef = Math.abs(coef);
+                
+                // Afegeix terme
+                if (exp === 0) {
+                    display += absCoef;
+                } else if (exp === 1) {
+                    if (absCoef === 1) {
+                        display += 'x';
+                    } else {
+                        display += absCoef + 'x';
+                    }
+                } else {
+                    if (absCoef === 1) {
+                        display += 'x' + toSuperscript(exp);
+                    } else {
+                        display += absCoef + 'x' + toSuperscript(exp);
+                    }
+                }
+            });
+            
+            return display;
+        }
+        
+        function normalizePolinomi(str) {
+            // Normalitza per comparar
+            str = str.toLowerCase().trim();
+            str = str.replace(/\s+/g, ''); // Elimina espais
+            
+            // Converteix superscripts
+            const superToNormal = {
+                '⁰': '0', '¹': '1', '²': '2', '³': '3', 
+                '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7'
+            };
+            Object.keys(superToNormal).forEach(sup => {
+                str = str.split(sup).join(superToNormal[sup]);
+            });
+            
+            // Normalitza el signe inicial
+            if (str.startsWith('+')) {
+                str = str.substring(1);
+            }
+            
+            return str;
+        }
+        
+        function selectClassification(type) {
+            selectedClass = type;
+            document.querySelectorAll('.class-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+        
+        function checkAnswers() {
+            let allCorrect = true;
+            
+            // 1. Comprova ordre
+            const ordenatInput = document.getElementById('ordenatInput');
+            const ordenatUser = normalizePolinomi(ordenatInput.value);
+            const ordenatCorrect = normalizePolinomi(currentPolinomi.displayOrdenat);
+            const ordenatFeedback = document.getElementById('ordenatFeedback');
+            
+            if (ordenatUser === ordenatCorrect) {
+                ordenatInput.className = 'correct';
+                ordenatFeedback.className = 'feedback correct';
+                ordenatFeedback.textContent = '✓ Correcte!';
+            } else {
+                ordenatInput.className = 'incorrect';
+                ordenatFeedback.className = 'feedback incorrect';
+                ordenatFeedback.textContent = `✗ Incorrecte. L'ordre correcte és: ${currentPolinomi.displayOrdenat}`;
+                allCorrect = false;
+            }
+            
+            // 2. Comprova grau
+            const grauInput = document.getElementById('grauInput');
+            const grauUser = parseInt(grauInput.value);
+            const grauFeedback = document.getElementById('grauFeedback');
+            
+            if (grauUser === currentPolinomi.grau) {
+                grauInput.className = 'correct';
+                grauFeedback.className = 'feedback correct';
+                grauFeedback.textContent = '✓ Correcte!';
+            } else {
+                grauInput.className = 'incorrect';
+                grauFeedback.className = 'feedback incorrect';
+                grauFeedback.textContent = `✗ Incorrecte. El grau és ${currentPolinomi.grau}`;
+                allCorrect = false;
+            }
+            
+            // 3. Comprova classificació
+            const classFeedback = document.getElementById('classFeedback');
+            const options = document.querySelectorAll('.class-option');
+            
+            if (selectedClass === currentPolinomi.classificacio) {
+                options.forEach(opt => {
+                    if (opt.textContent.toLowerCase() === selectedClass) {
+                        opt.classList.add('correct');
+                    }
+                });
+                classFeedback.className = 'feedback correct';
+                classFeedback.textContent = '✓ Correcte!';
+            } else {
+                options.forEach(opt => {
+                    const optText = opt.textContent.toLowerCase();
+                    if (optText === selectedClass) {
+                        opt.classList.add('incorrect');
+                    }
+                    if (optText === currentPolinomi.classificacio) {
+                        opt.classList.add('correct');
+                    }
+                });
+                classFeedback.className = 'feedback incorrect';
+                classFeedback.textContent = `✗ Incorrecte. És un ${currentPolinomi.classificacio}`;
+                allCorrect = false;
+            }
+            
+            // 4. Comprova terme independent
+            const independentInput = document.getElementById('independentInput');
+            const independentUser = parseInt(independentInput.value);
+            const independentFeedback = document.getElementById('independentFeedback');
+            
+            if (independentUser === currentPolinomi.independent) {
+                independentInput.className = 'correct';
+                independentFeedback.className = 'feedback correct';
+                independentFeedback.textContent = '✓ Correcte!';
+            } else {
+                independentInput.className = 'incorrect';
+                independentFeedback.className = 'feedback incorrect';
+                if (currentPolinomi.independent === 0) {
+                    independentFeedback.textContent = '✗ Incorrecte. No hi ha terme independent (és 0)';
+                } else {
+                    independentFeedback.textContent = `✗ Incorrecte. El terme independent és ${currentPolinomi.independent}`;
+                }
+                allCorrect = false;
+            }
+            
+            // Actualitza puntuació
+            if (allCorrect) {
+                score++;
+                document.getElementById('score').textContent = score;
+            } else {
+                errors++;
+                document.getElementById('errors').textContent = errors;
+            }
+            
+            document.getElementById('checkBtn').disabled = true;
+        }
+        
+        function newExercise() {
+            currentPolinomi = generatePolinomi();
+            document.getElementById('polinomiDisplay').textContent = currentPolinomi.displayDesordenat;
+            
+            // Neteja camps
+            document.getElementById('ordenatInput').value = '';
+            document.getElementById('grauInput').value = '';
+            document.getElementById('independentInput').value = '';
+            selectedClass = null;
+            
+            // Neteja feedback
+            ['ordenat', 'grau', 'class', 'independent'].forEach(id => {
+                const input = document.getElementById(id + 'Input');
+                const feedback = document.getElementById(id + 'Feedback');
+                if (input) input.className = '';
+                feedback.className = 'feedback';
+                feedback.textContent = '';
+            });
+            
+            // Neteja opcions de classificació
+            document.querySelectorAll('.class-option').forEach(opt => {
+                opt.className = 'class-option';
+            });
+            
+            document.getElementById('checkBtn').disabled = false;
+            document.getElementById('ordenatInput').focus();
+        }
+        
+        // Permet comprovar amb Enter
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !document.getElementById('checkBtn').disabled) {
+                    checkAnswers();
+                }
+            });
+        });
+        
+        newExercise();
+    </script>
+</body>
+</html>
