@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monomis semblants</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .score {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .score span {
+            color: #667eea;
+        }
+        
+        .instructions {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .instructions strong {
+            color: #667eea;
+        }
+        
+        .monomis-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .monomi-card {
+            background: #f8f9fa;
+            border: 3px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            transition: all 0.3s;
+            user-select: none;
+        }
+        
+        .monomi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .monomi-card.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .groups-container {
+            margin-top: 30px;
+        }
+        
+        .group {
+            background: #f8f9fa;
+            border: 2px dashed #ccc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            min-height: 80px;
+        }
+        
+        .group-title {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .group-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .group-monomi {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-size: 20px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .group-monomi:hover {
+            background: #e7f3ff;
+        }
+        
+        .group.correct {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        
+        .group.incorrect {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-group {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-group:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-check {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .btn-check:hover:not(:disabled) {
+            background: #e0a800;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+        }
+        
+        .btn-new {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-new:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .feedback.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+        
+        .feedback.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .monomis-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧩 Agrupa els monomis semblants</h1>
+        <p class="subtitle">Exercici interactiu de Matemàtiques - 2n ESO</p>
+        
+        <div class="score">
+            Encerts: <span id="score">0</span> | Errors: <span id="errors" style="color: #dc3545;">0</span>
+        </div>
+        
+        <div class="instructions">
+            <strong>Com funciona:</strong>
+            <ol style="margin-left: 20px; margin-top: 10px;">
+                <li>Selecciona els monomis que vols agrupar (clica'ls)</li>
+                <li>Clica "Crear grup" per fer un grup amb els seleccionats</li>
+                <li>Quan acabis, clica "Comprovar grups"</li>
+            </ol>
+            <p style="margin-top: 10px;"><strong>Recordatori:</strong> Dos monomis són semblants si tenen la mateixa part literal (les mateixes lletres amb els mateixos exponents).</p>
+        </div>
+        
+        <div id="monomisContainer" class="monomis-container"></div>
+        
+        <div class="buttons">
+            <button class="btn-group" id="groupBtn" onclick="createGroup()" disabled>
+                📦 Crear grup (<span id="selectedCount">0</span> seleccionats)
+            </button>
+            <button class="btn-check" id="checkBtn" onclick="checkGroups()" disabled>
+                ✓ Comprovar grups
+            </button>
+            <button class="btn-new" onclick="newExercise()">→ Nou exercici</button>
+        </div>
+        
+        <div id="groupsContainer" class="groups-container"></div>
+        
+        <div id="feedback"></div>
+    </div>
+    
+    <script>
+        let monomis = [];
+        let selectedMonomis = [];
+        let groups = [];
+        let score = 0;
+        let errors = 0;
+        
+        const variables = ['x', 'y', 'z', 'a', 'b'];
+        
+        function toSuperscript(num) {
+            const superscripts = ['⁰', '¹', '²', '³', '⁴', '⁵'];
+            return superscripts[num] || num.toString();
+        }
+        
+        function generateMonomis() {
+            monomis = [];
+            
+            // Genera 2-3 grups de monomis semblants
+            const numGroups = Math.floor(Math.random() * 2) + 2; // 2 o 3 grups
+            
+            for (let g = 0; g < numGroups; g++) {
+                // Genera la part literal del grup
+                const numVars = Math.floor(Math.random() * 2) + 1; // 1 o 2 variables
+                const selectedVars = [];
+                const availableVars = [...variables];
+                
+                let partLiteral = '';
+                for (let i = 0; i < numVars; i++) {
+                    const randomIndex = Math.floor(Math.random() * availableVars.length);
+                    const variable = availableVars[randomIndex];
+                    availableVars.splice(randomIndex, 1);
+                    
+                    const exponent = Math.floor(Math.random() * 3) + 1; // 1 a 3
+                    selectedVars.push({ variable, exponent });
+                    
+                    partLiteral += variable;
+                    if (exponent > 1) {
+                        partLiteral += toSuperscript(exponent);
+                    }
+                }
+                
+                // Genera 2-3 monomis amb aquesta part literal
+                const numMonomis = Math.floor(Math.random() * 2) + 2; // 2 o 3 monomis
+                
+                for (let m = 0; m < numMonomis; m++) {
+                    const coeficient = Math.floor(Math.random() * 17) - 8; // -8 a 8
+                    if (coeficient === 0) continue;
+                    
+                    let display = '';
+                    if (coeficient === 1) {
+                        display = partLiteral;
+                    } else if (coeficient === -1) {
+                        display = '-' + partLiteral;
+                    } else {
+                        display = coeficient + partLiteral;
+                    }
+                    
+                    monomis.push({
+                        id: monomis.length,
+                        coeficient: coeficient,
+                        partLiteral: partLiteral,
+                        display: display,
+                        groupId: g
+                    });
+                }
+            }
+            
+            // Barreja els monomis
+            monomis.sort(() => Math.random() - 0.5);
+        }
+        
+        function renderMonomis() {
+            const container = document.getElementById('monomisContainer');
+            container.innerHTML = '';
+            
+            monomis.forEach(monomi => {
+                const card = document.createElement('div');
+                card.className = 'monomi-card';
+                card.textContent = monomi.display;
+                card.onclick = () => toggleMonomi(monomi.id);
+                card.id = 'monomi-' + monomi.id;
+                container.appendChild(card);
+            });
+        }
+        
+        function toggleMonomi(id) {
+            const index = selectedMonomis.indexOf(id);
+            const card = document.getElementById('monomi-' + id);
+            
+            if (index > -1) {
+                selectedMonomis.splice(index, 1);
+                card.classList.remove('selected');
+            } else {
+                selectedMonomis.push(id);
+                card.classList.add('selected');
+            }
+            
+            updateSelectedCount();
+        }
+        
+        function updateSelectedCount() {
+            document.getElementById('selectedCount').textContent = selectedMonomis.length;
+            document.getElementById('groupBtn').disabled = selectedMonomis.length < 2;
+        }
+        
+        function createGroup() {
+            if (selectedMonomis.length < 2) return;
+            
+            const groupMonomis = selectedMonomis.map(id => 
+                monomis.find(m => m.id === id)
+            );
+            
+            groups.push(groupMonomis);
+            
+            // Elimina els monomis del contenidor principal
+            selectedMonomis.forEach(id => {
+                const card = document.getElementById('monomi-' + id);
+                card.remove();
+                monomis = monomis.filter(m => m.id !== id);
+            });
+            
+            selectedMonomis = [];
+            updateSelectedCount();
+            renderGroups();
+            
+            // Habilita el botó de comprovar si hi ha grups
+            document.getElementById('checkBtn').disabled = groups.length === 0;
+        }
+        
+        function renderGroups() {
+            const container = document.getElementById('groupsContainer');
+            container.innerHTML = '';
+            
+            if (groups.length === 0) return;
+            
+            groups.forEach((group, index) => {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'group';
+                groupDiv.id = 'group-' + index;
+                
+                const title = document.createElement('div');
+                title.className = 'group-title';
+                title.textContent = `Grup ${index + 1}:`;
+                groupDiv.appendChild(title);
+                
+                const content = document.createElement('div');
+                content.className = 'group-content';
+                
+                group.forEach(monomi => {
+                    const monomiFiche = document.createElement('div');
+                    monomiFiche.className = 'group-monomi';
+                    monomiFiche.textContent = monomi.display;
+                    monomiFiche.onclick = () => removeFromGroup(index, monomi.id);
+                    content.appendChild(monomiFiche);
+                });
+                
+                groupDiv.appendChild(content);
+                container.appendChild(groupDiv);
+            });
+        }
+        
+        function removeFromGroup(groupIndex, monomiId) {
+            const monomi = groups[groupIndex].find(m => m.id === monomiId);
+            groups[groupIndex] = groups[groupIndex].filter(m => m.id !== monomiId);
+            
+            if (groups[groupIndex].length === 0) {
+                groups.splice(groupIndex, 1);
+            }
+            
+            monomis.push(monomi);
+            renderMonomis();
+            renderGroups();
+            
+            if (groups.length === 0) {
+                document.getElementById('checkBtn').disabled = true;
+            }
+        }
+        
+        function checkGroups() {
+            let allCorrect = true;
+            const feedback = document.getElementById('feedback');
+            
+            groups.forEach((group, index) => {
+                const groupDiv = document.getElementById('group-' + index);
+                
+                // Comprova si tots els monomis del grup tenen la mateixa part literal
+                const firstPartLiteral = group[0].partLiteral;
+                const isCorrect = group.every(m => m.partLiteral === firstPartLiteral);
+                
+                if (isCorrect) {
+                    groupDiv.classList.add('correct');
+                    groupDiv.classList.remove('incorrect');
+                } else {
+                    groupDiv.classList.add('incorrect');
+                    groupDiv.classList.remove('correct');
+                    allCorrect = false;
+                }
+            });
+            
+            // Comprova si queden monomis sense agrupar que haurien d'estar agrupats
+            const remainingGroups = {};
+            monomis.forEach(m => {
+                if (!remainingGroups[m.partLiteral]) {
+                    remainingGroups[m.partLiteral] = [];
+                }
+                remainingGroups[m.partLiteral].push(m);
+            });
+            
+            const hasUngroupedSimilar = Object.values(remainingGroups).some(g => g.length > 1);
+            
+            if (allCorrect && !hasUngroupedSimilar) {
+                feedback.className = 'feedback success';
+                feedback.textContent = '🎉 Excel·lent! Tots els grups són correctes!';
+                score++;
+                document.getElementById('score').textContent = score;
+            } else {
+                feedback.className = 'feedback error';
+                if (!allCorrect) {
+                    feedback.textContent = '❌ Alguns grups contenen monomis que NO són semblants. Revisa les parts literals!';
+                } else {
+                    feedback.textContent = '❌ Encara queden monomis semblants sense agrupar!';
+                }
+                errors++;
+                document.getElementById('errors').textContent = errors;
+            }
+            
+            document.getElementById('checkBtn').disabled = true;
+        }
+        
+        function newExercise() {
+            generateMonomis();
+            renderMonomis();
+            selectedMonomis = [];
+            groups = [];
+            updateSelectedCount();
+            
+            document.getElementById('groupsContainer').innerHTML = '';
+            document.getElementById('feedback').innerHTML = '';
+            document.getElementById('checkBtn').disabled = true;
+            
+            // Neteja les classes de correcte/incorrecte
+            document.querySelectorAll('.group').forEach(g => {
+                g.classList.remove('correct', 'incorrect');
+            });
+        }
+        
+        // Inicia el primer exercici
+        newExercise();
+    </script>
+</body>
+</html>
