@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reconèixer identitats notables</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .score {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .score span {
+            color: #667eea;
+        }
+        
+        .difficulty-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .difficulty-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .difficulty-btn:hover {
+            background: #e7f3ff;
+        }
+        
+        .difficulty-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .expression-display {
+            background: #f8f9fa;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            font-family: 'Courier New', monospace;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .question-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 18px;
+            text-align: center;
+        }
+        
+        .identities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .identity-card {
+            background: white;
+            border: 3px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .identity-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border-color: #667eea;
+        }
+        
+        .identity-card.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .identity-card.correct {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        
+        .identity-card.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        
+        .identity-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .identity-formula {
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            margin: 10px 0;
+        }
+        
+        .identity-example {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #666;
+            margin-top: 10px;
+        }
+        
+        .identity-card.selected .identity-example,
+        .identity-card.correct .identity-example,
+        .identity-card.incorrect .identity-example {
+            color: inherit;
+            opacity: 0.8;
+        }
+        
+        .hint-section {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            display: none;
+        }
+        
+        .hint-section.visible {
+            display: block;
+        }
+        
+        .hint-title {
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        
+        .hint-content {
+            color: #856404;
+            line-height: 1.8;
+            font-size: 14px;
+        }
+        
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-align: center;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+        
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+        
+        .feedback.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffc107;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-hint {
+            background: #ffc107;
+            color: #333;
+            flex: 0.5;
+        }
+        
+        .btn-hint:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+        }
+        
+        .btn-check {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-check:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-new {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-new:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .help-text {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-top: 25px;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .help-text strong {
+            color: #667eea;
+        }
+        
+        .identity-info {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .expression-display {
+                font-size: 24px;
+                padding: 25px;
+            }
+            
+            .identities-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .difficulty-selector {
+                flex-direction: column;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 Reconèixer identitats notables</h1>
+        <p class="subtitle">Exercici interactiu de Matemàtiques - 2n ESO</p>
+        
+        <div class="score">
+            Encerts: <span id="score">0</span> | Errors: <span id="errors" style="color: #dc3545;">0</span>
+        </div>
+        
+        <div class="difficulty-selector">
+            <button class="difficulty-btn active" onclick="setDifficulty('easy')">Fàcil (forma simple)</button>
+            <button class="difficulty-btn" onclick="setDifficulty('medium')">Mitjà (forma desenvolupada)</button>
+            <button class="difficulty-btn" onclick="setDifficulty('hard')">Difícil (barreja)</button>
+        </div>
+        
+        <div class="expression-display" id="expressionDisplay"></div>
+        
+        <div class="hint-section" id="hintSection">
+            <div class="hint-title">💡 Ajuda:</div>
+            <div class="hint-content" id="hintContent"></div>
+        </div>
+        
+        <div class="question-label">Quina identitat notable és?</div>
+        
+        <div class="identities-grid" id="identitiesGrid"></div>
+        
+        <div class="buttons">
+            <button class="btn-hint" onclick="showHint()">💡 Pista</button>
+            <button class="btn-check" id="checkBtn" onclick="checkAnswer()">✓ Comprovar</button>
+            <button class="btn-new" onclick="newExercise()">→ Nou exercici</button>
+        </div>
+        
+        <div class="feedback" id="feedback"></div>
+        
+        <div class="help-text">
+            <strong>Les 3 identitats notables principals:</strong>
+            <div class="identity-info">
+                <strong>1. Quadrat d'una suma:</strong> (a + b)² = a² + 2ab + b²
+            </div>
+            <div class="identity-info">
+                <strong>2. Quadrat d'una diferència:</strong> (a - b)² = a² - 2ab + b²
+            </div>
+            <div class="identity-info">
+                <strong>3. Suma per diferència:</strong> (a + b)(a - b) = a² - b²
+            </div>
+            <p style="margin-top: 10px;"><strong>Consell:</strong> Fixa't en els signes i en si hi ha un terme mixt (2ab)!</p>
+        </div>
+    </div>
+    
+    <script>
+        let currentExercise = {};
+        let score = 0;
+        let errors = 0;
+        let difficulty = 'easy';
+        let selectedIdentity = null;
+        let hintShown = false;
+        
+        const identities = [
+            {
+                id: 'suma_quadrat',
+                name: 'Quadrat d\'una suma',
+                formula: '(a + b)²',
+                expanded: 'a² + 2ab + b²',
+                pattern: 'suma_quadrat'
+            },
+            {
+                id: 'diferencia_quadrat',
+                name: 'Quadrat d\'una diferència',
+                formula: '(a - b)²',
+                expanded: 'a² - 2ab + b²',
+                pattern: 'diferencia_quadrat'
+            },
+            {
+                id: 'suma_diferencia',
+                name: 'Suma per diferència',
+                formula: '(a + b)(a - b)',
+                expanded: 'a² - b²',
+                pattern: 'suma_diferencia'
+            }
+        ];
+        
+        function toSuperscript(num) {
+            const superscripts = ['⁰', '¹', '²', '³', '⁴', '⁵'];
+            return superscripts[num] || num.toString();
+        }
+        
+        function setDifficulty(level) {
+            difficulty = level;
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            newExercise();
+        }
+        
+        function generateExpression(identity, difficulty) {
+            const a = Math.floor(Math.random() * 5) + 1; // 1 a 5
+            const b = Math.floor(Math.random() * 5) + 1; // 1 a 5
+            
+            const aVar = 'x';
+            const bTerm = b.toString();
+            
+            let display = '';
+            
+            if (difficulty === 'easy') {
+                // Mostra la forma simple
+                if (identity.pattern === 'suma_quadrat') {
+                    display = `(${aVar} + ${bTerm})²`;
+                } else if (identity.pattern === 'diferencia_quadrat') {
+                    display = `(${aVar} - ${bTerm})²`;
+                } else {
+                    display = `(${aVar} + ${bTerm})(${aVar} - ${bTerm})`;
+                }
+            } else if (difficulty === 'medium') {
+                // Mostra la forma desenvolupada
+                if (identity.pattern === 'suma_quadrat') {
+                    display = `${aVar}² + ${2*b}${aVar} + ${b*b}`;
+                } else if (identity.pattern === 'diferencia_quadrat') {
+                    display = `${aVar}² - ${2*b}${aVar} + ${b*b}`;
+                } else {
+                    display = `${aVar}² - ${b*b}`;
+                }
+            } else {
+                // Difícil: barreja aleatòria
+                const showSimple = Math.random() > 0.5;
+                if (showSimple) {
+                    if (identity.pattern === 'suma_quadrat') {
+                        display = `(${aVar} + ${bTerm})²`;
+                    } else if (identity.pattern === 'diferencia_quadrat') {
+                        display = `(${aVar} - ${bTerm})²`;
+                    } else {
+                        display = `(${aVar} + ${bTerm})(${aVar} - ${bTerm})`;
+                    }
+                } else {
+                    if (identity.pattern === 'suma_quadrat') {
+                        display = `${aVar}² + ${2*b}${aVar} + ${b*b}`;
+                    } else if (identity.pattern === 'diferencia_quadrat') {
+                        display = `${aVar}² - ${2*b}${aVar} + ${b*b}`;
+                    } else {
+                        display = `${aVar}² - ${b*b}`;
+                    }
+                }
+            }
+            
+            return { display, a, b, aVar, isSimple: difficulty === 'easy' || (difficulty === 'hard' && Math.random() > 0.5) };
+        }
+        
+        function renderIdentities() {
+            const grid = document.getElementById('identitiesGrid');
+            grid.innerHTML = '';
+            
+            identities.forEach(identity => {
+                const card = document.createElement('div');
+                card.className = 'identity-card';
+                card.onclick = () => selectIdentity(identity.id);
+                card.id = 'card-' + identity.id;
+                
+                card.innerHTML = `
+                    <div class="identity-title">${identity.name}</div>
+                    <div class="identity-formula">${identity.formula}</div>
+                    <div class="identity-example">${identity.expanded}</div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+        
+        function selectIdentity(id) {
+            selectedIdentity = id;
+            document.querySelectorAll('.identity-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.getElementById('card-' + id).classList.add('selected');
+        }
+        
+        function generateExercise() {
+            const randomIdentity = identities[Math.floor(Math.random() * identities.length)];
+            const expression = generateExpression(randomIdentity, difficulty);
+            
+            return {
+                correctIdentity: randomIdentity.id,
+                ...expression
+            };
+        }
+        
+        function showHint() {
+            hintShown = true;
+            const hintSection = document.getElementById('hintSection');
+            const hintContent = document.getElementById('hintContent');
+            
+            const identity = identities.find(i => i.id === currentExercise.correctIdentity);
+            
+            let hint = '<strong>Pistes per reconèixer:</strong><br><br>';
+            
+            if (identity.pattern === 'suma_quadrat') {
+                hint += '🔍 Busca aquestes característiques:<br>';
+                hint += '• Té la forma (x + a)² o bé x² + 2ax + a²<br>';
+                hint += '• TOTS els termes són POSITIUS<br>';
+                hint += '• Hi ha un terme mixt (2ax) que és el DOBLE del producte<br>';
+                hint += '• Els termes extrems són quadrats perfectes';
+            } else if (identity.pattern === 'diferencia_quadrat') {
+                hint += '🔍 Busca aquestes característiques:<br>';
+                hint += '• Té la forma (x - a)² o bé x² - 2ax + a²<br>';
+                hint += '• El terme mixt és NEGATIU<br>';
+                hint += '• L\'últim terme és POSITIU<br>';
+                hint += '• Hi ha un terme mixt (2ax) que és el DOBLE del producte';
+            } else {
+                hint += '🔍 Busca aquestes característiques:<br>';
+                hint += '• Té la forma (x + a)(x - a) o bé x² - a²<br>';
+                hint += '• NOMÉS hi ha 2 termes (no hi ha terme mixt)<br>';
+                hint += '• Un terme és POSITIU i l\'altre NEGATIU<br>';
+                hint += '• Tots dos són quadrats perfectes';
+            }
+            
+            hintContent.innerHTML = hint;
+            hintSection.classList.add('visible');
+        }
+        
+        function checkAnswer() {
+            const feedback = document.getElementById('feedback');
+            
+            if (!selectedIdentity) {
+                feedback.className = 'feedback warning';
+                feedback.textContent = '⚠️ Selecciona una identitat!';
+                return;
+            }
+            
+            const correctCard = document.getElementById('card-' + currentExercise.correctIdentity);
+            const selectedCard = document.getElementById('card-' + selectedIdentity);
+            
+            if (selectedIdentity === currentExercise.correctIdentity) {
+                selectedCard.classList.remove('selected');
+                selectedCard.classList.add('correct');
+                feedback.className = 'feedback correct';
+                
+                let message = '🎉 Excel·lent! Has identificat correctament la identitat!';
+                if (hintShown) {
+                    message += ' (Has utilitzat una pista)';
+                }
+                feedback.textContent = message;
+                
+                score++;
+                document.getElementById('score').textContent = score;
+            } else {
+                selectedCard.classList.remove('selected');
+                selectedCard.classList.add('incorrect');
+                correctCard.classList.add('correct');
+                
+                feedback.className = 'feedback incorrect';
+                const correctIdentity = identities.find(i => i.id === currentExercise.correctIdentity);
+                feedback.textContent = `✗ Incorrecte. La identitat correcta és: ${correctIdentity.name}`;
+                
+                errors++;
+                document.getElementById('errors').textContent = errors;
+                
+                if (!hintShown) {
+                    showHint();
+                }
+            }
+            
+            document.getElementById('checkBtn').disabled = true;
+        }
+        
+        function newExercise() {
+            currentExercise = generateExercise();
+            
+            document.getElementById('expressionDisplay').textContent = currentExercise.display;
+            
+            selectedIdentity = null;
+            hintShown = false;
+            
+            renderIdentities();
+            
+            const feedback = document.getElementById('feedback');
+            const hintSection = document.getElementById('hintSection');
+            
+            feedback.className = 'feedback';
+            feedback.textContent = '';
+            hintSection.classList.remove('visible');
+            
+            document.getElementById('checkBtn').disabled = false;
+        }
+        
+        newExercise();
+    </script>
+</body>
+</html>
