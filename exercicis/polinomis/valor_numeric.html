@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valor numèric de polinomis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .score {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .score span {
+            color: #667eea;
+        }
+        
+        .polinomi-display {
+            background: #f8f9fa;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .substitution-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .substitution-title {
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        
+        .substitution-display {
+            font-size: 20px;
+            font-family: 'Courier New', monospace;
+            color: #333;
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        
+        .value-display {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .answer-section {
+            margin-bottom: 25px;
+        }
+        
+        .answer-label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .answer-input-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .equals {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        input[type="number"] {
+            width: 200px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 24px;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+        }
+        
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        input.correct {
+            border-color: #28a745;
+            background-color: #d4edda;
+        }
+        
+        input.incorrect {
+            border-color: #dc3545;
+            background-color: #f8d7da;
+        }
+        
+        .show-process-btn {
+            display: block;
+            margin: 15px auto;
+            padding: 10px 20px;
+            background: #ffc107;
+            color: #333;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .show-process-btn:hover {
+            background: #e0a800;
+            transform: scale(1.05);
+        }
+        
+        .process-steps {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .process-steps.visible {
+            display: block;
+        }
+        
+        .process-title {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        
+        .step {
+            margin-bottom: 12px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .step-label {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-align: center;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+        
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+        
+        .feedback.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffc107;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-check {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-check:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-new {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-new:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .help-text {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-top: 25px;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .help-text strong {
+            color: #667eea;
+        }
+        
+        .help-text ol {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .polinomi-display {
+                font-size: 20px;
+                padding: 20px;
+            }
+            
+            input[type="number"] {
+                width: 150px;
+                font-size: 20px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔢 Valor numèric de polinomis</h1>
+        <p class="subtitle">Exercici interactiu de Matemàtiques - 2n ESO</p>
+        
+        <div class="score">
+            Encerts: <span id="score">0</span> | Errors: <span id="errors" style="color: #dc3545;">0</span>
+        </div>
+        
+        <div class="polinomi-display" id="polinomiDisplay"></div>
+        
+        <div class="substitution-box">
+            <div class="substitution-title">📝 Substitueix el valor de la variable:</div>
+            <div class="value-display" id="valueDisplay"></div>
+            <button class="show-process-btn" onclick="toggleProcess()">👁️ Veure substitució</button>
+            <div class="substitution-display" id="substitutionDisplay" style="display: none;"></div>
+        </div>
+        
+        <div class="answer-section">
+            <label class="answer-label">Quin és el resultat?</label>
+            <div class="answer-input-container">
+                <span class="equals">P(<span id="varValue"></span>) =</span>
+                <input type="number" id="answerInput" placeholder="Resultat">
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <button class="btn-check" id="checkBtn" onclick="checkAnswer()">✓ Comprovar</button>
+            <button class="btn-new" onclick="newExercise()">→ Nou exercici</button>
+        </div>
+        
+        <div class="feedback" id="feedback"></div>
+        
+        <div class="process-steps" id="processSteps">
+            <div class="process-title">🔍 Procés de càlcul pas a pas:</div>
+            <div id="stepsContent"></div>
+        </div>
+        
+        <div class="help-text">
+            <strong>Recordatori - Valor numèric d'un polinomi:</strong>
+            <ol>
+                <li>Substitueix la variable pel valor donat</li>
+                <li>Calcula les potències (exponents)</li>
+                <li>Multiplica els coeficients per les potències</li>
+                <li>Suma o resta tots els termes</li>
+            </ol>
+            <p style="margin-top: 10px;"><strong>Exemple:</strong> Si P(x) = 2x² - 3x + 5 i x = 2, llavors:<br>
+            P(2) = 2·(2)² - 3·(2) + 5 = 2·4 - 6 + 5 = 8 - 6 + 5 = 7</p>
+        </div>
+    </div>
+    
+    <script>
+        let currentExercise = {};
+        let score = 0;
+        let errors = 0;
+        
+        function toSuperscript(num) {
+            const superscripts = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷'];
+            return superscripts[num] || num.toString();
+        }
+        
+        function generatePolinomi() {
+            const numTermes = Math.floor(Math.random() * 3) + 2; // 2 a 4 termes
+            const grauMax = Math.floor(Math.random() * 3) + 2; // grau 2 a 4
+            
+            const termes = [];
+            const exponents = [];
+            
+            // Genera exponents únics
+            for (let i = 0; i <= grauMax; i++) {
+                exponents.push(i);
+            }
+            
+            exponents.sort(() => Math.random() - 0.5);
+            const selectedExponents = exponents.slice(0, numTermes);
+            
+            // Crea termes
+            selectedExponents.forEach(exp => {
+                let coef = Math.floor(Math.random() * 9) + 1; // 1 a 9
+                const sign = Math.random() > 0.5 ? 1 : -1;
+                coef *= sign;
+                
+                termes.push({
+                    coeficient: coef,
+                    exponent: exp
+                });
+            });
+            
+            // Ordena de major a menor exponent
+            termes.sort((a, b) => b.exponent - a.exponent);
+            
+            // Genera valor de x (de -3 a 5, però evita 0)
+            let xValue;
+            do {
+                xValue = Math.floor(Math.random() * 9) - 3; // de -3 a 5
+            } while (xValue === 0);
+            
+            // Calcula el valor numèric
+            let result = 0;
+            const calculationSteps = [];
+            
+            termes.forEach(terme => {
+                const power = Math.pow(xValue, terme.exponent);
+                const value = terme.coeficient * power;
+                result += value;
+                
+                calculationSteps.push({
+                    coeficient: terme.coeficient,
+                    exponent: terme.exponent,
+                    xValue: xValue,
+                    power: power,
+                    value: value
+                });
+            });
+            
+            // Genera displays
+            const display = generateDisplay(termes);
+            const substitutionDisplay = generateSubstitutionDisplay(termes, xValue);
+            
+            return {
+                termes: termes,
+                xValue: xValue,
+                result: result,
+                display: display,
+                substitutionDisplay: substitutionDisplay,
+                calculationSteps: calculationSteps
+            };
+        }
+        
+        function generateDisplay(termes) {
+            let display = '';
+            
+            termes.forEach((terme, index) => {
+                const coef = terme.coeficient;
+                const exp = terme.exponent;
+                
+                if (index === 0) {
+                    if (coef < 0) display += '-';
+                } else {
+                    display += coef >= 0 ? ' + ' : ' - ';
+                }
+                
+                const absCoef = Math.abs(coef);
+                
+                if (exp === 0) {
+                    display += absCoef;
+                } else if (exp === 1) {
+                    if (absCoef === 1) {
+                        display += 'x';
+                    } else {
+                        display += absCoef + 'x';
+                    }
+                } else {
+                    if (absCoef === 1) {
+                        display += 'x' + toSuperscript(exp);
+                    } else {
+                        display += absCoef + 'x' + toSuperscript(exp);
+                    }
+                }
+            });
+            
+            return display;
+        }
+        
+        function generateSubstitutionDisplay(termes, xValue) {
+            let display = '';
+            
+            termes.forEach((terme, index) => {
+                const coef = terme.coeficient;
+                const exp = terme.exponent;
+                
+                if (index === 0) {
+                    if (coef < 0) display += '-';
+                } else {
+                    display += coef >= 0 ? ' + ' : ' - ';
+                }
+                
+                const absCoef = Math.abs(coef);
+                
+                if (exp === 0) {
+                    display += absCoef;
+                } else if (exp === 1) {
+                    if (absCoef === 1) {
+                        display += `(${xValue})`;
+                    } else {
+                        display += `${absCoef}·(${xValue})`;
+                    }
+                } else {
+                    if (absCoef === 1) {
+                        display += `(${xValue})${toSuperscript(exp)}`;
+                    } else {
+                        display += `${absCoef}·(${xValue})${toSuperscript(exp)}`;
+                    }
+                }
+            });
+            
+            return display;
+        }
+        
+        function toggleProcess() {
+            const substitution = document.getElementById('substitutionDisplay');
+            const btn = event.target;
+            
+            if (substitution.style.display === 'none') {
+                substitution.style.display = 'block';
+                substitution.textContent = currentExercise.substitutionDisplay;
+                btn.textContent = '🙈 Amagar substitució';
+            } else {
+                substitution.style.display = 'none';
+                btn.textContent = '👁️ Veure substitució';
+            }
+        }
+        
+        function showDetailedProcess() {
+            const processDiv = document.getElementById('processSteps');
+            const stepsContent = document.getElementById('stepsContent');
+            
+            stepsContent.innerHTML = '';
+            
+            currentExercise.calculationSteps.forEach((step, index) => {
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'step';
+                
+                let stepText = `<div class="step-label">Terme ${index + 1}:</div>`;
+                
+                if (step.exponent === 0) {
+                    stepText += `Terme independent: ${step.coeficient}`;
+                } else if (step.exponent === 1) {
+                    stepText += `${step.coeficient} × ${step.xValue} = ${step.value}`;
+                } else {
+                    stepText += `${step.coeficient} × (${step.xValue})${toSuperscript(step.exponent)} = ${step.coeficient} × ${step.power} = ${step.value}`;
+                }
+                
+                stepDiv.innerHTML = stepText;
+                stepsContent.appendChild(stepDiv);
+            });
+            
+            // Suma final
+            const finalStep = document.createElement('div');
+            finalStep.className = 'step';
+            finalStep.style.fontWeight = 'bold';
+            finalStep.style.background = '#d4edda';
+            
+            const values = currentExercise.calculationSteps.map(s => s.value);
+            const sumText = values.join(' + ').replace(/\+ -/g, '- ');
+            finalStep.innerHTML = `<div class="step-label">Suma total:</div>${sumText} = ${currentExercise.result}`;
+            stepsContent.appendChild(finalStep);
+            
+            processDiv.classList.add('visible');
+        }
+        
+        function checkAnswer() {
+            const userAnswer = parseInt(document.getElementById('answerInput').value);
+            const feedback = document.getElementById('feedback');
+            const input = document.getElementById('answerInput');
+            
+            if (isNaN(userAnswer)) {
+                feedback.className = 'feedback warning';
+                feedback.textContent = '⚠️ Escriu un número!';
+                return;
+            }
+            
+            if (userAnswer === currentExercise.result) {
+                input.className = 'correct';
+                feedback.className = 'feedback correct';
+                feedback.textContent = '🎉 Excel·lent! La resposta és correcta!';
+                score++;
+                document.getElementById('score').textContent = score;
+            } else {
+                input.className = 'incorrect';
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = `✗ Incorrecte. La resposta correcta és ${currentExercise.result}`;
+                errors++;
+                document.getElementById('errors').textContent = errors;
+                
+                // Mostra el procés detallat quan falla
+                showDetailedProcess();
+            }
+            
+            document.getElementById('checkBtn').disabled = true;
+        }
+        
+        function newExercise() {
+            currentExercise = generatePolinomi();
+            document.getElementById('polinomiDisplay').textContent = 'P(x) = ' + currentExercise.display;
+            document.getElementById('valueDisplay').textContent = `x = ${currentExercise.xValue}`;
+            document.getElementById('varValue').textContent = currentExercise.xValue;
+            document.getElementById('answerInput').value = '';
+            
+            const input = document.getElementById('answerInput');
+            const feedback = document.getElementById('feedback');
+            const processSteps = document.getElementById('processSteps');
+            const substitution = document.getElementById('substitutionDisplay');
+            
+            input.className = '';
+            feedback.className = 'feedback';
+            feedback.textContent = '';
+            processSteps.classList.remove('visible');
+            substitution.style.display = 'none';
+            
+            const btn = document.querySelector('.show-process-btn');
+            btn.textContent = '👁️ Veure substitució';
+            
+            document.getElementById('checkBtn').disabled = false;
+            document.getElementById('answerInput').focus();
+        }
+        
+        // Permet comprovar amb Enter
+        document.getElementById('answerInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !document.getElementById('checkBtn').disabled) {
+                checkAnswer();
+            }
+        });
+        
+        newExercise();
+    </script>
+</body>
+</html>
