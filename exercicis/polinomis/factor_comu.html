@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extracció de factor comú</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .score {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .score span {
+            color: #667eea;
+        }
+        
+        .difficulty-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .difficulty-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .difficulty-btn:hover {
+            background: #e7f3ff;
+        }
+        
+        .difficulty-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .expression-display {
+            background: #f8f9fa;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            font-family: 'Courier New', monospace;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .hint-section {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            display: none;
+        }
+        
+        .hint-section.visible {
+            display: block;
+        }
+        
+        .hint-title {
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        
+        .hint-content {
+            color: #856404;
+            line-height: 1.8;
+            font-size: 14px;
+        }
+        
+        .hint-step {
+            background: white;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .answer-section {
+            margin-bottom: 25px;
+        }
+        
+        .answer-label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .answer-input-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .equals {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        input[type="text"] {
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 20px;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+        }
+        
+        .factor-input {
+            width: 150px;
+        }
+        
+        .parenthesis-input {
+            width: 300px;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        input.correct {
+            border-color: #28a745;
+            background-color: #d4edda;
+        }
+        
+        input.incorrect {
+            border-color: #dc3545;
+            background-color: #f8d7da;
+        }
+        
+        .parenthesis {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-align: center;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+        
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+        
+        .feedback.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffc107;
+        }
+        
+        .correct-answer {
+            font-size: 18px;
+            font-family: 'Courier New', monospace;
+            margin-top: 5px;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-hint {
+            background: #ffc107;
+            color: #333;
+            flex: 0.5;
+        }
+        
+        .btn-hint:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+        }
+        
+        .btn-check {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-check:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-new {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-new:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .help-text {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-top: 25px;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .help-text strong {
+            color: #667eea;
+        }
+        
+        .help-text ol {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .expression-display {
+                font-size: 20px;
+                padding: 20px;
+            }
+            
+            .answer-input-container {
+                flex-direction: column;
+            }
+            
+            .factor-input, .parenthesis-input {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Extracció de factor comú</h1>
+        <p class="subtitle">Exercici interactiu de Matemàtiques - 2n ESO</p>
+        
+        <div class="score">
+            Encerts: <span id="score">0</span> | Errors: <span id="errors" style="color: #dc3545;">0</span>
+        </div>
+        
+        <div class="difficulty-selector">
+            <button class="difficulty-btn active" onclick="setDifficulty('easy')">Fàcil</button>
+            <button class="difficulty-btn" onclick="setDifficulty('medium')">Mitjà</button>
+            <button class="difficulty-btn" onclick="setDifficulty('hard')">Difícil</button>
+        </div>
+        
+        <div class="expression-display" id="expressionDisplay"></div>
+        
+        <div class="hint-section" id="hintSection">
+            <div class="hint-title">💡 Ajuda pas a pas:</div>
+            <div class="hint-content" id="hintContent"></div>
+        </div>
+        
+        <div class="answer-section">
+            <label class="answer-label">Extreu el factor comú:</label>
+            <div class="answer-input-container">
+                <input type="text" id="factorInput" class="factor-input" placeholder="Factor">
+                <span class="parenthesis">(</span>
+                <input type="text" id="parenthesisInput" class="parenthesis-input" placeholder="Contingut del parèntesi">
+                <span class="parenthesis">)</span>
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <button class="btn-hint" onclick="showHint()">💡 Pista</button>
+            <button class="btn-check" id="checkBtn" onclick="checkAnswer()">✓ Comprovar</button>
+            <button class="btn-new" onclick="newExercise()">→ Nou exercici</button>
+        </div>
+        
+        <div class="feedback" id="feedback"></div>
+        
+        <div class="help-text">
+            <strong>Recordatori - Extracció de factor comú:</strong>
+            <ol>
+                <li><strong>Troba el MCD dels coeficients:</strong> El número més gran que divideix tots els coeficients</li>
+                <li><strong>Troba les variables comunes:</strong> Les lletres que apareixen en TOTS els termes</li>
+                <li><strong>Tria l'exponent més petit:</strong> Per cada variable comuna, agafa el menor exponent</li>
+                <li><strong>Divideix cada terme pel factor comú</strong> i posa el resultat dins el parèntesi</li>
+            </ol>
+            <p style="margin-top: 10px;"><strong>Exemple:</strong><br>
+            <strong>Fàcil:</strong> 4x² + 8x = 4x(x + 2)<br>
+            <strong>Mitjà:</strong> 6x³ + 9x² - 3x = 3x(2x² + 3x - 1)<br>
+            <strong>Difícil:</strong> 12x⁵ + 18x⁴ - 6x³ = 6x³(2x² + 3x - 1)</p>
+        </div>
+    </div>
+    
+    <script>
+        let currentExercise = {};
+        let score = 0;
+        let errors = 0;
+        let difficulty = 'easy';
+        let hintShown = false;
+        
+        function setDifficulty(level) {
+            difficulty = level;
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            newExercise();
+        }
+        
+        function toSuperscript(num) {
+            const superscripts = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷'];
+            return superscripts[num] || num.toString();
+        }
+        
+        function gcd(a, b) {
+            a = Math.abs(a);
+            b = Math.abs(b);
+            while (b !== 0) {
+                let temp = b;
+                b = a % b;
+                a = temp;
+            }
+            return a;
+        }
+        
+        function gcdArray(arr) {
+            return arr.reduce((a, b) => gcd(a, b));
+        }
+        
+        function generateExercise() {
+            let commonCoef, commonExp, numTermes, maxAdditionalExp;
+            
+            if (difficulty === 'easy') {
+                // Fàcil: 2 termes, factor comú senzill
+                commonCoef = Math.floor(Math.random() * 3) + 2; // 2 a 4
+                commonExp = 1; // Sempre x
+                numTermes = 2;
+                maxAdditionalExp = 2; // x fins a x³
+            } else if (difficulty === 'medium') {
+                // Mitjà: 2-3 termes, exponents més alts
+                commonCoef = Math.floor(Math.random() * 4) + 2; // 2 a 5
+                commonExp = Math.floor(Math.random() * 2) + 1; // x o x²
+                numTermes = Math.floor(Math.random() * 2) + 2; // 2 o 3
+                maxAdditionalExp = 3; // fins a x⁴ o x⁵
+            } else {
+                // Difícil: 3 termes, MCD més complex, exponents alts
+                commonCoef = Math.floor(Math.random() * 5) + 3; // 3 a 7
+                commonExp = Math.floor(Math.random() * 3) + 1; // x, x² o x³
+                numTermes = 3;
+                maxAdditionalExp = 3; // fins a x⁶
+            }
+            
+            const termes = [];
+            
+            for (let i = 0; i < numTermes; i++) {
+                let coef = Math.floor(Math.random() * 4) + 1; // 1 a 4
+                const sign = i === 0 ? 1 : (Math.random() > 0.3 ? 1 : -1);
+                coef *= sign * commonCoef;
+                
+                const exp = commonExp + Math.floor(Math.random() * maxAdditionalExp);
+                
+                termes.push({
+                    coeficient: coef,
+                    exponent: exp
+                });
+            }
+            
+            // Calcula el factor comú real
+            const coefs = termes.map(t => Math.abs(t.coeficient));
+            const realCommonCoef = gcdArray(coefs);
+            const realCommonExp = Math.min(...termes.map(t => t.exponent));
+            
+            // Calcula els termes dins el parèntesi
+            const parenthesisTermes = termes.map(t => ({
+                coeficient: t.coeficient / realCommonCoef,
+                exponent: t.exponent - realCommonExp
+            }));
+            
+            return {
+                termes,
+                commonCoef: realCommonCoef,
+                commonExp: realCommonExp,
+                parenthesisTermes,
+                display: displayPolinomi(termes),
+                factorDisplay: displayFactor(realCommonCoef, realCommonExp),
+                parenthesisDisplay: displayPolinomi(parenthesisTermes, false)
+            };
+        }
+        
+        function displayFactor(coef, exp) {
+            if (exp === 0) return coef.toString();
+            if (exp === 1) {
+                if (coef === 1) return 'x';
+                return coef + 'x';
+            }
+            if (coef === 1) return 'x' + toSuperscript(exp);
+            return coef + 'x' + toSuperscript(exp);
+        }
+        
+        function displayPolinomi(termes, useSign = true) {
+            let display = '';
+            
+            termes.forEach((terme, index) => {
+                const coef = terme.coeficient;
+                const exp = terme.exponent;
+                
+                if (index === 0 && useSign) {
+                    if (coef < 0) display += '-';
+                } else {
+                    display += coef >= 0 ? ' + ' : ' - ';
+                }
+                
+                const absCoef = Math.abs(coef);
+                
+                if (exp === 0) {
+                    display += absCoef;
+                } else if (exp === 1) {
+                    if (absCoef === 1) {
+                        display += 'x';
+                    } else {
+                        display += absCoef + 'x';
+                    }
+                } else {
+                    if (absCoef === 1) {
+                        display += 'x' + toSuperscript(exp);
+                    } else {
+                        display += absCoef + 'x' + toSuperscript(exp);
+                    }
+                }
+            });
+            
+            return display;
+        }
+        
+        function showHint() {
+            hintShown = true;
+            const hintSection = document.getElementById('hintSection');
+            const hintContent = document.getElementById('hintContent');
+            
+            let hint = '<strong>Pas 1: Troba el MCD dels coeficients</strong><br>';
+            const coefs = currentExercise.termes.map(t => Math.abs(t.coeficient));
+            hint += `<div class="hint-step">Coeficients: ${coefs.join(', ')}<br>`;
+            hint += `MCD = ${currentExercise.commonCoef}</div>`;
+            
+            hint += '<br><strong>Pas 2: Troba l\'exponent mínim de x</strong><br>';
+            const exps = currentExercise.termes.map(t => t.exponent);
+            hint += `<div class="hint-step">Exponents: ${exps.join(', ')}<br>`;
+            hint += `Mínim = ${currentExercise.commonExp}</div>`;
+            
+            hint += `<br><strong>Pas 3: Factor comú = ${currentExercise.factorDisplay}</strong><br>`;
+            
+            hint += '<br><strong>Pas 4: Divideix cada terme pel factor comú</strong><br>';
+            currentExercise.termes.forEach((terme, index) => {
+                const originalTerm = displayPolinomi([terme], false);
+                const resultCoef = terme.coeficient / currentExercise.commonCoef;
+                const resultExp = terme.exponent - currentExercise.commonExp;
+                const resultTerm = displayPolinomi([{coeficient: resultCoef, exponent: resultExp}], false);
+                
+                hint += `<div class="hint-step">${originalTerm} ÷ ${currentExercise.factorDisplay} = ${resultTerm}</div>`;
+            });
+            
+            hint += `<br><strong>Resultat final:</strong> ${currentExercise.factorDisplay}(${currentExercise.parenthesisDisplay})`;
+            
+            hintContent.innerHTML = hint;
+            hintSection.classList.add('visible');
+        }
+        
+        function normalizeExpression(str) {
+            str = str.toLowerCase().trim();
+            str = str.replace(/\s+/g, '');
+            
+            const superToNormal = {
+                '⁰': '0', '¹': '1', '²': '2', '³': '3', 
+                '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7'
+            };
+            Object.keys(superToNormal).forEach(sup => {
+                str = str.split(sup).join(superToNormal[sup]);
+            });
+            
+            if (str.startsWith('+')) {
+                str = str.substring(1);
+            }
+            
+            return str;
+        }
+        
+        function checkAnswer() {
+            const factorUser = normalizeExpression(document.getElementById('factorInput').value);
+            const parenthesisUser = normalizeExpression(document.getElementById('parenthesisInput').value);
+            
+            const factorCorrect = normalizeExpression(currentExercise.factorDisplay);
+            const parenthesisCorrect = normalizeExpression(currentExercise.parenthesisDisplay);
+            
+            const feedback = document.getElementById('feedback');
+            const factorInput = document.getElementById('factorInput');
+            const parenthesisInput = document.getElementById('parenthesisInput');
+            
+            if (!factorUser || !parenthesisUser) {
+                feedback.className = 'feedback warning';
+                feedback.textContent = '⚠️ Omple tots els camps!';
+                return;
+            }
+            
+            const factorIsCorrect = factorUser === factorCorrect;
+            const parenthesisIsCorrect = parenthesisUser === parenthesisCorrect;
+            
+            if (factorIsCorrect) {
+                factorInput.className = 'correct';
+            } else {
+                factorInput.className = 'incorrect';
+            }
+            
+            if (parenthesisIsCorrect) {
+                parenthesisInput.className = 'correct';
+            } else {
+                parenthesisInput.className = 'incorrect';
+            }
+            
+            if (factorIsCorrect && parenthesisIsCorrect) {
+                feedback.className = 'feedback correct';
+                
+                let message = '🎉 Excel·lent! La factorització és correcta!';
+                if (hintShown) {
+                    message += ' (Has utilitzat una pista)';
+                }
+                feedback.textContent = message;
+                
+                score++;
+                document.getElementById('score').textContent = score;
+            } else {
+                feedback.className = 'feedback incorrect';
+                
+                let errorMsg = '✗ Incorrecte. ';
+                if (!factorIsCorrect && !parenthesisIsCorrect) {
+                    errorMsg += 'Tant el factor com el parèntesi són incorrectes.';
+                } else if (!factorIsCorrect) {
+                    errorMsg += 'El factor comú és incorrecte.';
+                } else {
+                    errorMsg += 'El contingut del parèntesi és incorrecte.';
+                }
+                
+                feedback.innerHTML = `${errorMsg}<br><span class="correct-answer">Resposta correcta: ${currentExercise.factorDisplay}(${currentExercise.parenthesisDisplay})</span>`;
+                
+                errors++;
+                document.getElementById('errors').textContent = errors;
+                
+                if (!hintShown) {
+                    showHint();
+                }
+            }
+            
+            document.getElementById('checkBtn').disabled = true;
+        }
+        
+        function newExercise() {
+            currentExercise = generateExercise();
+            
+            document.getElementById('expressionDisplay').textContent = currentExercise.display;
+            document.getElementById('factorInput').value = '';
+            document.getElementById('parenthesisInput').value = '';
+            
+            const factorInput = document.getElementById('factorInput');
+            const parenthesisInput = document.getElementById('parenthesisInput');
+            const feedback = document.getElementById('feedback');
+            const hintSection = document.getElementById('hintSection');
+            
+            factorInput.className = 'factor-input';
+            parenthesisInput.className = 'parenthesis-input';
+            feedback.className = 'feedback';
+            feedback.textContent = '';
+            hintSection.classList.remove('visible');
+            hintShown = false;
+            
+            document.getElementById('checkBtn').disabled = false;
+            document.getElementById('factorInput').focus();
+        }
+        
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !document.getElementById('checkBtn').disabled) {
+                    checkAnswer();
+                }
+            });
+        });
+        
+        newExercise();
+    </script>
+</body>
+</html>
