@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suma i resta de polinomis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .score {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .score span {
+            color: #667eea;
+        }
+        
+        .operation-display {
+            background: #f8f9fa;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .polinomi-line {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+        }
+        
+        .operation-sign {
+            font-size: 32px;
+            color: #667eea;
+            margin: 5px 0;
+        }
+        
+        .divider {
+            border-top: 3px solid #667eea;
+            margin: 15px 0;
+        }
+        
+        .hint-section {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            display: none;
+        }
+        
+        .hint-section.visible {
+            display: block;
+        }
+        
+        .hint-title {
+            font-weight: 600;
+            color: #856404;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        
+        .hint-content {
+            color: #856404;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        
+        .hint-content ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        
+        .answer-section {
+            margin-bottom: 25px;
+        }
+        
+        .answer-label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .answer-input-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .equals {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        input[type="text"] {
+            flex: 1;
+            max-width: 500px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 20px;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        input.correct {
+            border-color: #28a745;
+            background-color: #d4edda;
+        }
+        
+        input.incorrect {
+            border-color: #dc3545;
+            background-color: #f8d7da;
+        }
+        
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-align: center;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+        
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+        
+        .feedback.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffc107;
+        }
+        
+        .correct-answer {
+            font-size: 18px;
+            font-family: 'Courier New', monospace;
+            margin-top: 5px;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-hint {
+            background: #ffc107;
+            color: #333;
+            flex: 0.5;
+        }
+        
+        .btn-hint:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+        }
+        
+        .btn-check {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-check:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-new {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-new:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .help-text {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-top: 25px;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .help-text strong {
+            color: #667eea;
+        }
+        
+        .help-text ol {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .polinomi-line {
+                font-size: 18px;
+            }
+            
+            input[type="text"] {
+                font-size: 16px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>➕ Suma i resta de polinomis</h1>
+        <p class="subtitle">Exercici interactiu de Matemàtiques - 2n ESO</p>
+        
+        <div class="score">
+            Encerts: <span id="score">0</span> | Errors: <span id="errors" style="color: #dc3545;">0</span>
+        </div>
+        
+        <div class="operation-display">
+            <div class="polinomi-line" id="polinomi1"></div>
+            <div class="operation-sign" id="operationSign"></div>
+            <div class="polinomi-line" id="polinomi2"></div>
+            <div class="divider"></div>
+        </div>
+        
+        <div class="hint-section" id="hintSection">
+            <div class="hint-title">💡 Ajuda pas a pas:</div>
+            <div class="hint-content" id="hintContent"></div>
+        </div>
+        
+        <div class="answer-section">
+            <label class="answer-label">Escriu el polinomi resultant:</label>
+            <div class="answer-input-container">
+                <span class="equals">=</span>
+                <input type="text" id="answerInput" placeholder="Ex: 3x² - 2x + 5">
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <button class="btn-hint" onclick="showHint()">💡 Pista</button>
+            <button class="btn-check" id="checkBtn" onclick="checkAnswer()">✓ Comprovar</button>
+            <button class="btn-new" onclick="newExercise()">→ Nou exercici</button>
+        </div>
+        
+        <div class="feedback" id="feedback"></div>
+        
+        <div class="help-text">
+            <strong>Recordatori - Suma i resta de polinomis:</strong>
+            <ol>
+                <li>Identifica els termes semblants (mateixa part literal)</li>
+                <li>Suma o resta els coeficients dels termes semblants</li>
+                <li>Mantén la part literal</li>
+                <li>Escriu el resultat ordenat de major a menor grau</li>
+            </ol>
+            <p style="margin-top: 10px;"><strong>Exemple:</strong><br>
+            (3x² + 2x - 1) + (x² - 5x + 4) = 4x² - 3x + 3</p>
+        </div>
+    </div>
+    
+    <script>
+        let currentExercise = {};
+        let score = 0;
+        let errors = 0;
+        let hintShown = false;
+        
+        function toSuperscript(num) {
+            const superscripts = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷'];
+            return superscripts[num] || num.toString();
+        }
+        
+        function generatePolinomi(maxGrau = 3, numTermes = 3) {
+            const termes = [];
+            const exponents = [];
+            
+            // Selecciona exponents únics
+            for (let i = 0; i <= maxGrau; i++) {
+                exponents.push(i);
+            }
+            
+            exponents.sort(() => Math.random() - 0.5);
+            const selectedExponents = exponents.slice(0, numTermes);
+            
+            selectedExponents.forEach(exp => {
+                let coef = Math.floor(Math.random() * 9) + 1;
+                const sign = Math.random() > 0.5 ? 1 : -1;
+                coef *= sign;
+                
+                termes.push({
+                    coeficient: coef,
+                    exponent: exp
+                });
+            });
+            
+            termes.sort((a, b) => b.exponent - a.exponent);
+            
+            return termes;
+        }
+        
+        function displayPolinomi(termes) {
+            let display = '';
+            
+            termes.forEach((terme, index) => {
+                const coef = terme.coeficient;
+                const exp = terme.exponent;
+                
+                if (index === 0) {
+                    if (coef < 0) display += '-';
+                } else {
+                    display += coef >= 0 ? ' + ' : ' - ';
+                }
+                
+                const absCoef = Math.abs(coef);
+                
+                if (exp === 0) {
+                    display += absCoef;
+                } else if (exp === 1) {
+                    if (absCoef === 1) {
+                        display += 'x';
+                    } else {
+                        display += absCoef + 'x';
+                    }
+                } else {
+                    if (absCoef === 1) {
+                        display += 'x' + toSuperscript(exp);
+                    } else {
+                        display += absCoef + 'x' + toSuperscript(exp);
+                    }
+                }
+            });
+            
+            return display;
+        }
+        
+        function operatePolinomis(termes1, termes2, operation) {
+            const termesMap = {};
+            
+            // Afegeix termes del primer polinomi
+            termes1.forEach(t => {
+                termesMap[t.exponent] = t.coeficient;
+            });
+            
+            // Opera amb els termes del segon polinomi
+            termes2.forEach(t => {
+                if (termesMap[t.exponent] !== undefined) {
+                    if (operation === '+') {
+                        termesMap[t.exponent] += t.coeficient;
+                    } else {
+                        termesMap[t.exponent] -= t.coeficient;
+                    }
+                } else {
+                    if (operation === '+') {
+                        termesMap[t.exponent] = t.coeficient;
+                    } else {
+                        termesMap[t.exponent] = -t.coeficient;
+                    }
+                }
+            });
+            
+            // Construeix el resultat
+            const result = [];
+            Object.keys(termesMap).forEach(exp => {
+                const coef = termesMap[exp];
+                if (coef !== 0) {
+                    result.push({
+                        coeficient: coef,
+                        exponent: parseInt(exp)
+                    });
+                }
+            });
+            
+            result.sort((a, b) => b.exponent - a.exponent);
+            
+            return result;
+        }
+        
+        function generateExercise() {
+            const operation = Math.random() > 0.5 ? '+' : '-';
+            const grau = Math.floor(Math.random() * 2) + 2; // grau 2 o 3
+            const numTermes = Math.floor(Math.random() * 2) + 2; // 2 o 3 termes
+            
+            const polinomi1 = generatePolinomi(grau, numTermes);
+            const polinomi2 = generatePolinomi(grau, numTermes);
+            const result = operatePolinomis(polinomi1, polinomi2, operation);
+            
+            return {
+                polinomi1: polinomi1,
+                polinomi2: polinomi2,
+                operation: operation,
+                result: result,
+                display1: displayPolinomi(polinomi1),
+                display2: displayPolinomi(polinomi2),
+                displayResult: displayPolinomi(result)
+            };
+        }
+        
+        function showHint() {
+            hintShown = true;
+            const hintSection = document.getElementById('hintSection');
+            const hintContent = document.getElementById('hintContent');
+            
+            let hint = '<strong>Procés:</strong><ul>';
+            
+            const allExponents = new Set();
+            currentExercise.polinomi1.forEach(t => allExponents.add(t.exponent));
+            currentExercise.polinomi2.forEach(t => allExponents.add(t.exponent));
+            
+            const sortedExponents = Array.from(allExponents).sort((a, b) => b - a);
+            
+            sortedExponents.forEach(exp => {
+                const t1 = currentExercise.polinomi1.find(t => t.exponent === exp);
+                const t2 = currentExercise.polinomi2.find(t => t.exponent === exp);
+                
+                const c1 = t1 ? t1.coeficient : 0;
+                const c2 = t2 ? t2.coeficient : 0;
+                
+                let expStr = '';
+                if (exp === 0) expStr = '(terme independent)';
+                else if (exp === 1) expStr = 'x';
+                else expStr = 'x' + toSuperscript(exp);
+                
+                if (currentExercise.operation === '+') {
+                    hint += `<li>${expStr}: ${c1} + ${c2} = ${c1 + c2}</li>`;
+                } else {
+                    hint += `<li>${expStr}: ${c1} - (${c2}) = ${c1 - c2}</li>`;
+                }
+            });
+            
+            hint += '</ul>';
+            
+            hintContent.innerHTML = hint;
+            hintSection.classList.add('visible');
+        }
+        
+        function normalizePolinomi(str) {
+            str = str.toLowerCase().trim();
+            str = str.replace(/\s+/g, '');
+            
+            const superToNormal = {
+                '⁰': '0', '¹': '1', '²': '2', '³': '3', 
+                '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7'
+            };
+            Object.keys(superToNormal).forEach(sup => {
+                str = str.split(sup).join(superToNormal[sup]);
+            });
+            
+            if (str.startsWith('+')) {
+                str = str.substring(1);
+            }
+            
+            return str;
+        }
+        
+        function checkAnswer() {
+            const userAnswer = normalizePolinomi(document.getElementById('answerInput').value);
+            const correctAnswer = normalizePolinomi(currentExercise.displayResult);
+            const feedback = document.getElementById('feedback');
+            const input = document.getElementById('answerInput');
+            
+            if (!userAnswer) {
+                feedback.className = 'feedback warning';
+                feedback.textContent = '⚠️ Escriu una resposta!';
+                return;
+            }
+            
+            if (userAnswer === correctAnswer) {
+                input.className = 'correct';
+                feedback.className = 'feedback correct';
+                
+                let message = '🎉 Excel·lent! La resposta és correcta!';
+                if (hintShown) {
+                    message += ' (Has utilitzat una pista)';
+                }
+                feedback.textContent = message;
+                
+                score++;
+                document.getElementById('score').textContent = score;
+            } else {
+                input.className = 'incorrect';
+                feedback.className = 'feedback incorrect';
+                feedback.innerHTML = `✗ Incorrecte.<br><span class="correct-answer">La resposta correcta és: ${currentExercise.displayResult}</span>`;
+                
+                errors++;
+                document.getElementById('errors').textContent = errors;
+                
+                // Mostra automàticament la pista
+                if (!hintShown) {
+                    showHint();
+                }
+            }
+            
+            document.getElementById('checkBtn').disabled = true;
+        }
+        
+        function newExercise() {
+            currentExercise = generateExercise();
+            
+            document.getElementById('polinomi1').textContent = currentExercise.display1;
+            document.getElementById('polinomi2').textContent = currentExercise.display2;
+            document.getElementById('operationSign').textContent = currentExercise.operation === '+' ? '+' : '−';
+            document.getElementById('answerInput').value = '';
+            
+            const input = document.getElementById('answerInput');
+            const feedback = document.getElementById('feedback');
+            const hintSection = document.getElementById('hintSection');
+            
+            input.className = '';
+            feedback.className = 'feedback';
+            feedback.textContent = '';
+            hintSection.classList.remove('visible');
+            hintShown = false;
+            
+            document.getElementById('checkBtn').disabled = false;
+            document.getElementById('answerInput').focus();
+        }
+        
+        document.getElementById('answerInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !document.getElementById('checkBtn').disabled) {
+                checkAnswer();
+            }
+        });
+        
+        newExercise();
+    </script>
+</body>
+</html>
