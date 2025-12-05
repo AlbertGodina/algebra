@@ -342,8 +342,8 @@
         </div>
         
         <div class="difficulty-selector">
-            <button class="difficulty-btn active" onclick="setDifficulty('easy')">Fàcil (nombres petits)</button>
-            <button class="difficulty-btn" onclick="setDifficulty('medium')">Mitjà (nombres més grans)</button>
+            <button class="difficulty-btn active" onclick="setDifficulty('easy')">Fàcil (números petits)</button>
+            <button class="difficulty-btn" onclick="setDifficulty('medium')">Mitjà (números més grans)</button>
             <button class="difficulty-btn" onclick="setDifficulty('hard')">Difícil (amb coeficients)</button>
         </div>
         
@@ -384,7 +384,9 @@
         </div>
     </div>
     
-    <script>
+    <script type="module">
+        import * as math from 'https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js';
+        
         let currentExercise = {};
         let score = 0;
         let errors = 0;
@@ -411,12 +413,12 @@
             let a, b, aCoef;
             
             if (difficulty === 'easy') {
-                // Fàcil: nombres petits, sense coeficient a x
+                // Fàcil: números petits, sense coeficient a x
                 a = 1; // només x
                 b = Math.floor(Math.random() * 5) + 2; // 2 a 6
                 aCoef = 1;
             } else if (difficulty === 'medium') {
-                // Mitjà: nombres més grans
+                // Mitjà: números més grans
                 a = 1;
                 b = Math.floor(Math.random() * 8) + 3; // 3 a 10
                 aCoef = 1;
@@ -539,6 +541,16 @@
         
         function normalizeExpression(str) {
             str = str.toLowerCase().trim();
+            
+            // Converteix diferents formats d'exponents
+            str = str.replace(/\^2/g, '²');
+            str = str.replace(/\^3/g, '³');
+            str = str.replace(/\^4/g, '⁴');
+            
+            // Accepta x2 com x²
+            str = str.replace(/x2([^0-9]|$)/g, 'x²$1');
+            str = str.replace(/x3([^0-9]|$)/g, 'x³$1');
+            
             str = str.replace(/\s+/g, '');
             
             const superToNormal = {
@@ -556,19 +568,44 @@
             return str;
         }
         
+        function areExpressionsEquivalent(expr1, expr2) {
+            // Normalitza primer
+            expr1 = normalizeExpression(expr1);
+            expr2 = normalizeExpression(expr2);
+            
+            // Si són iguals després de normalitzar, retorna true
+            if (expr1 === expr2) return true;
+            
+            // Intenta amb Math.js per validació algebraica
+            try {
+                // Converteix x^2 a x*x per Math.js
+                const parseExpr1 = expr1.replace(/x\^?(\d)/g, 'x^$1');
+                const parseExpr2 = expr2.replace(/x\^?(\d)/g, 'x^$1');
+                
+                const simplified1 = math.simplify(parseExpr1).toString();
+                const simplified2 = math.simplify(parseExpr2).toString();
+                
+                return simplified1 === simplified2;
+            } catch (e) {
+                // Si Math.js falla, compara directament
+                console.log('Math.js error:', e);
+                return expr1 === expr2;
+            }
+        }
+        
         function checkAnswer() {
-            const userAnswer = normalizeExpression(document.getElementById('answerInput').value);
-            const correctAnswer = normalizeExpression(currentExercise.result);
+            const userAnswer = document.getElementById('answerInput').value;
+            const correctAnswer = currentExercise.result;
             const feedback = document.getElementById('feedback');
             const input = document.getElementById('answerInput');
             
-            if (!userAnswer) {
+            if (!userAnswer.trim()) {
                 feedback.className = 'feedback warning';
                 feedback.textContent = '⚠️ Escriu una resposta!';
                 return;
             }
             
-            if (userAnswer === correctAnswer) {
+            if (areExpressionsEquivalent(userAnswer, correctAnswer)) {
                 input.className = 'correct';
                 feedback.className = 'feedback correct';
                 
