@@ -388,7 +388,9 @@
         </div>
     </div>
     
-    <script>
+    <script type="module">
+        import * as math from 'https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js';
+        
         let currentExercise = {};
         let score = 0;
         let errors = 0;
@@ -525,6 +527,16 @@
         
         function normalizeExpression(str) {
             str = str.toLowerCase().trim();
+            
+            // Converteix diferents formats d'exponents
+            str = str.replace(/\^2/g, '²');
+            str = str.replace(/\^3/g, '³');
+            str = str.replace(/\^4/g, '⁴');
+            
+            // Accepta x2 com x²
+            str = str.replace(/x2([^0-9]|$)/g, 'x²$1');
+            str = str.replace(/x3([^0-9]|$)/g, 'x³$1');
+            
             str = str.replace(/\s+/g, '');
             
             const superToNormal = {
@@ -535,34 +547,49 @@
                 str = str.split(sup).join(superToNormal[sup]);
             });
             
-            // També accepta parèntesis en diferent ordre per suma × diferència
-            // (x+3)(x-3) és el mateix que (x-3)(x+3)
-            
             return str;
         }
         
-        function checkAnswer() {
-            const userAnswer = normalizeExpression(document.getElementById('answerInput').value);
-            let correctAnswer = normalizeExpression(currentExercise.result);
+        function areExpressionsEquivalent(expr1, expr2) {
+            // Normalitza primer
+            expr1 = normalizeExpression(expr1);
+            expr2 = normalizeExpression(expr2);
             
-            // Per suma per diferència, també accepta l'ordre invers
-            let alternativeAnswer = null;
-            if (currentExercise.type === 'suma_diferencia') {
-                const aStr = currentExercise.aCoef === 1 ? 'x' : `${currentExercise.aCoef}x`;
-                const alt = `(${aStr} - ${currentExercise.b})(${aStr} + ${currentExercise.b})`;
-                alternativeAnswer = normalizeExpression(alt);
+            // Si són iguals després de normalitzar, retorna true
+            if (expr1 === expr2) return true;
+            
+            // Intenta desenvolupar les expressions i comparar
+            try {
+                // Converteix format per Math.js
+                const parseExpr1 = expr1.replace(/x(\d)/g, 'x^$1').replace(/²/g, '^2').replace(/³/g, '^3');
+                const parseExpr2 = expr2.replace(/x(\d)/g, 'x^$1').replace(/²/g, '^2').replace(/³/g, '^3');
+                
+                // Expandeix les expressions per comparar-les
+                const expanded1 = math.simplify(parseExpr1).toString();
+                const expanded2 = math.simplify(parseExpr2).toString();
+                
+                return expanded1 === expanded2;
+            } catch (e) {
+                console.log('Math.js error:', e);
+                return expr1 === expr2;
             }
+        }
+        
+        function checkAnswer() {
+            const userAnswer = document.getElementById('answerInput').value;
+            let correctAnswer = currentExercise.result;
             
             const feedback = document.getElementById('feedback');
             const input = document.getElementById('answerInput');
             
-            if (!userAnswer) {
+            if (!userAnswer.trim()) {
                 feedback.className = 'feedback warning';
                 feedback.textContent = '⚠️ Escriu una resposta!';
                 return;
             }
             
-            const isCorrect = userAnswer === correctAnswer || userAnswer === alternativeAnswer;
+            // Comprova si són expressions equivalents
+            const isCorrect = areExpressionsEquivalent(userAnswer, correctAnswer);
             
             if (isCorrect) {
                 input.className = 'correct';
